@@ -1,0 +1,81 @@
+{
+  "name": "artisanpack-ui/analytics-google",
+  "description": "Google Analytics (GA4) provider for the ArtisanPack UI analytics package, with server-side Data API reporting via the google base package.",
+  "type": "library",
+  "license": "MIT",
+  "version": "1.0.0",
+  "keywords": [
+    "laravel",
+    "google",
+    "google-analytics",
+    "ga4",
+    "analytics",
+    "artisanpack-ui"
+  ],
+  "autoload": {
+    "psr-4": {
+      "ArtisanPackUI\\AnalyticsGoogle\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Jacob Martella",
+      "email": "me@jacobmartella.com"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+    "artisanpack-ui/core": "^1.0",
+    "artisanpack-ui/google": "^1.0"
+  },
+  "require-dev": {
+    "pestphp/pest": "^3.8|^4.0",
+    "pestphp/pest-plugin-laravel": "^3.2|^4.1",
+    "artisanpack-ui/code-style": "^1.1",
+    "artisanpack-ui/code-style-pint": "^1.1",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "laravel/pint": "^1.26",
+    "orchestra/testbench": "^10.2|^11.0",
+    "friendsofphp/php-cs-fixer": "^3.75"
+  },
+  "suggest": {
+    "artisanpack-ui/analytics": "Registers this package as the GA4 provider for the shared analytics dashboard and reporting APIs."
+  },
+  "scripts": {
+    "lint": [
+      "./vendor/bin/php-cs-fixer fix --dry-run --diff",
+      "./vendor/bin/phpcs"
+    ],
+    "fix": "./vendor/bin/php-cs-fixer fix",
+    "cs": "./vendor/bin/phpcs",
+    "cs:fix": "./vendor/bin/phpcbf",
+    "test": "./vendor/bin/pest"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "ArtisanPackUI\\AnalyticsGoogle\\AnalyticsGoogleServiceProvider"
+      ],
+      "aliases": {
+        "AnalyticsGoogle": "ArtisanPackUI\\AnalyticsGoogle\\Facades\\AnalyticsGoogle"
+      }
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

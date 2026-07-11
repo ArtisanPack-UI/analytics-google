@@ -1,0 +1,16 @@
+{
+    "name": "@artisanpack-ui/analytics-google-js",
+    "private": true,
+    "version": "1.0.0",
+    "description": "React and Vue components for the ArtisanPack UI Analytics Google (GA4) package.",
+    "main": "index.ts",
+    "type": "module",
+    "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "vue": "^3.4.0"
+    },
+    "peerDependenciesMeta": {
+        "react": { "optional": true },
+        "vue": { "optional": true }
+    }
+}

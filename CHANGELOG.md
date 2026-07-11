@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added the `GaTopContent` surface: Livewire component (`<livewire:analytics-google::ga-top-content />`), React (`<GaTopContent />`) and Vue equivalents, HTTP endpoint at `/analytics-google/top-content`, and a `GaTopContentFetcher` that pulls top pages (by page views) and top events (by count) from the GA4 Data API.
+- Added AdminWidget wrappers for the CMS framework: `analytics-google-overview` and `analytics-google-top-content` register automatically when `artisanpack-ui/cms-framework` is installed.
+- Expanded the README with an install matrix, per-framework reporting-component usage, and a graceful-degradation section.
 - Initial scaffold from the ArtisanPack UI package blueprint.
 - Client-side GA4 tracking via the `@ga4Snippet` Blade directive plus React and Vue equivalents.
 - Server-side GA4 Data API client (`Ga4DataClient`) with typed `ReportRequest` / `ReportResponse` DTOs.

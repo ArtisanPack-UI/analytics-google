@@ -16,7 +16,11 @@
 declare( strict_types=1 );
 
 use ArtisanPackUI\AnalyticsGoogle\Http\Controllers\GaOverviewController;
+use ArtisanPackUI\AnalyticsGoogle\Http\Controllers\GaTopContentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get( 'overview', GaOverviewController::class )
     ->name( 'analytics-google.overview' );
+
+Route::get( 'top-content', GaTopContentController::class )
+    ->name( 'analytics-google.top-content' );

@@ -95,6 +95,7 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
         $this->registerGoogleScopeHook();
         $this->registerLivewireComponents();
         $this->registerAnalyticsProvider();
+        $this->registerCmsFrameworkWidgets();
     }
 
     /**
@@ -181,6 +182,11 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
             'analytics-google::ga-overview',
             Livewire\GaOverview::class,
         );
+
+        \Livewire\Livewire::component(
+            'analytics-google::ga-top-content',
+            Livewire\GaTopContent::class,
+        );
     }
 
     /**
@@ -226,6 +232,54 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
 
                 return new Providers\Ga4AnalyticsProviderAdapter( $ga4, $providerName );
             } );
+        } );
+    }
+
+    /**
+     * Register the two Livewire components as CMS-framework admin
+     * dashboard widgets when the CMS framework is installed.
+     *
+     * The wrapper classes extend the Livewire components and add the
+     * `AdminWidgetInterface` contract, so instantiating them via the
+     * AdminWidgetManager renders the same UI as
+     * `<livewire:analytics-google::ga-overview />`.
+     *
+     * Skips silently when either the CMS framework or Livewire itself
+     * is missing — the wrappers only make sense with both present.
+     *
+     * @since 1.0.0
+     */
+    protected function registerCmsFrameworkWidgets(): void
+    {
+        if ( ! interface_exists( \ArtisanPackUI\CMSFramework\Modules\AdminWidgets\Contracts\AdminWidgetInterface::class ) ) {
+            return;
+        }
+
+        if ( ! class_exists( \ArtisanPackUI\CMSFramework\Modules\AdminWidgets\Services\AdminWidgetManager::class ) ) {
+            return;
+        }
+
+        if ( ! class_exists( \Livewire\Livewire::class ) ) {
+            return;
+        }
+
+        $this->app->booted( function (): void {
+            if ( ! $this->app->bound( \ArtisanPackUI\CMSFramework\Modules\AdminWidgets\Services\AdminWidgetManager::class ) ) {
+                return;
+            }
+
+            $manager = $this->app->make( \ArtisanPackUI\CMSFramework\Modules\AdminWidgets\Services\AdminWidgetManager::class );
+            $manager->register( 'analytics-google-overview', CmsFramework\GaOverviewWidget::class );
+            $manager->register( 'analytics-google-top-content', CmsFramework\GaTopContentWidget::class );
+
+            \Livewire\Livewire::component(
+                'analytics-google::cms-ga-overview-widget',
+                CmsFramework\GaOverviewWidget::class,
+            );
+            \Livewire\Livewire::component(
+                'analytics-google::cms-ga-top-content-widget',
+                CmsFramework\GaTopContentWidget::class,
+            );
         } );
     }
 }

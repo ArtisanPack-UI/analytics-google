@@ -26,6 +26,7 @@ final class ReportRequest
      * @param  list<DateRange>  $dateRanges
      * @param  list<string>  $metrics
      * @param  list<string>  $dimensions
+     * @param  list<array{metric?: string, dimension?: string, desc?: bool}>  $orderBys
      * @param  int|null  $limit
      * @param  int|null  $offset
      */
@@ -33,6 +34,7 @@ final class ReportRequest
         public readonly array $dateRanges,
         public readonly array $metrics,
         public readonly array $dimensions = [],
+        public readonly array $orderBys = [],
         public readonly ?int $limit = null,
         public readonly ?int $offset = null,
     ) {
@@ -45,11 +47,13 @@ final class ReportRequest
      *
      * @param  list<string>  $metrics
      * @param  list<string>  $dimensions
+     * @param  list<array{metric?: string, dimension?: string, desc?: bool}>  $orderBys
      */
     public static function make(
         DateRange $range,
         array $metrics,
         array $dimensions = [],
+        array $orderBys = [],
         ?int $limit = null,
         ?int $offset = null,
     ): self {
@@ -57,6 +61,7 @@ final class ReportRequest
             dateRanges: [ $range ],
             metrics: $metrics,
             dimensions: $dimensions,
+            orderBys: $orderBys,
             limit: $limit,
             offset: $offset,
         );
@@ -81,6 +86,25 @@ final class ReportRequest
                 static fn ( string $name ): array => [ 'name' => $name ],
                 $this->dimensions,
             );
+        }
+
+        if ( [] !== $this->orderBys ) {
+            $payload['orderBys'] = array_values( array_filter( array_map(
+                static function ( array $spec ): ?array {
+                    $desc = (bool) ( $spec['desc'] ?? false );
+
+                    if ( isset( $spec['metric'] ) ) {
+                        return [ 'metric' => [ 'metricName' => (string) $spec['metric'] ], 'desc' => $desc ];
+                    }
+
+                    if ( isset( $spec['dimension'] ) ) {
+                        return [ 'dimension' => [ 'dimensionName' => (string) $spec['dimension'] ], 'desc' => $desc ];
+                    }
+
+                    return null;
+                },
+                $this->orderBys,
+            ) ) );
         }
 
         if ( null !== $this->limit ) {

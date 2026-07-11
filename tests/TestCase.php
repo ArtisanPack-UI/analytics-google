@@ -5,56 +5,53 @@ declare( strict_types=1 );
 namespace Tests;
 
 use ArtisanPackUI\AnalyticsGoogle\AnalyticsGoogleServiceProvider;
+use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
+use ArtisanPackUI\Google\GoogleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**
- * Base Test Case
+ * Base test case for the AnalyticsGoogle package.
  *
- * Provides base functionality for all package tests.
- *
- * @since   1.0.0
+ * @since 1.0.0
  */
 abstract class TestCase extends BaseTestCase
 {
-    /**
-     * Setup the test environment.
-     */
     protected function setUp(): void
     {
         parent::setUp();
+
+        BaseInstalled::reset();
+    }
+
+    protected function tearDown(): void
+    {
+        BaseInstalled::reset();
+
+        parent::tearDown();
     }
 
     /**
-     * Gets package providers.
+     * @param  \Illuminate\Foundation\Application  $app
      *
-     * @since 1.0.0
-     *
-     * @param  \Illuminate\Foundation\Application  $app  The application instance.
-     *
-     * @return array<int, class-string> Array of service provider class names.
+     * @return array<int, class-string>
      */
     protected function getPackageProviders( $app ): array
     {
         return [
+            GoogleServiceProvider::class,
             AnalyticsGoogleServiceProvider::class,
         ];
     }
 
     /**
-     * Defines environment setup.
-     *
-     * @since 1.0.0
-     *
-     * @param  \Illuminate\Foundation\Application  $app  The application instance.
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function defineEnvironment( $app ): void
     {
-        // Setup app key for encryption
-        $app['config']->set( 'app.key', 'base64:' . base64_encode( random_bytes( 32 ) ) );
+        $app[ 'config' ]->set( 'app.key', 'base64:' . base64_encode( random_bytes( 32 ) ) );
 
-        // Setup default database to use sqlite :memory:
-        $app['config']->set( 'database.default', 'testbench' );
-        $app['config']->set( 'database.connections.testbench', [
+        $app[ 'config' ]->set( 'database.default', 'testbench' );
+        $app[ 'config' ]->set( 'database.connections.testbench', [
             'driver'                  => 'sqlite',
             'database'                => ':memory:',
             'prefix'                  => '',

@@ -34,21 +34,26 @@
   "require": {
     "php": "^8.2",
     "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
-    "artisanpack-ui/core": "^1.0",
-    "artisanpack-ui/google": "^1.0"
+    "artisanpack-ui/core": "^1.0"
   },
   "require-dev": {
     "pestphp/pest": "^3.8|^4.0",
     "pestphp/pest-plugin-laravel": "^3.2|^4.1",
     "artisanpack-ui/code-style": "^1.1",
     "artisanpack-ui/code-style-pint": "^1.1",
+    "artisanpack-ui/google": "^1.0",
+    "artisanpack-ui/hooks": "^1.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "guzzlehttp/guzzle": "^7.5",
     "laravel/pint": "^1.26",
+    "livewire/livewire": "^3.6",
     "orchestra/testbench": "^10.2|^11.0",
     "friendsofphp/php-cs-fixer": "^3.75"
   },
   "suggest": {
-    "artisanpack-ui/analytics": "Registers this package as the GA4 provider for the shared analytics dashboard and reporting APIs."
+    "artisanpack-ui/google": "Required for server-side reporting via the GA4 Data API (^1.0). Client-side tracking works without it.",
+    "artisanpack-ui/analytics": "Registers this package as the GA4 provider for the shared analytics dashboard and reporting APIs.",
+    "livewire/livewire": "Enables the <livewire:analytics-google::ga-overview /> reporting component (^3.6)."
   },
   "scripts": {
     "lint": [

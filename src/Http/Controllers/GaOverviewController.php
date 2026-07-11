@@ -19,7 +19,7 @@ use ArtisanPackUI\AnalyticsGoogle\Reporting\DateRange;
 use ArtisanPackUI\AnalyticsGoogle\Reporting\Ga4DataClient;
 use ArtisanPackUI\AnalyticsGoogle\Reporting\GaOverviewFetcher;
 use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
-use ArtisanPackUI\Google\Models\GoogleConnection;
+use ArtisanPackUI\AnalyticsGoogle\Support\GoogleConnectionResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -41,10 +41,10 @@ class GaOverviewController
             ], 501 );
         }
 
-        $days = max( 1, (int) $request->query( 'days', 30 ) );
+        $days = $this->clampDays( $request->query( 'days', 30 ) );
 
         $propertyIdInput = $request->query( 'property_id' );
-        $propertyId      = ( null === $propertyIdInput || '' === $propertyIdInput ) ? null : (string) $propertyIdInput;
+        $propertyId      = is_string( $propertyIdInput ) && '' !== $propertyIdInput ? $propertyIdInput : null;
 
         $user = $request->user();
 
@@ -55,12 +55,7 @@ class GaOverviewController
             ], 401 );
         }
 
-        /** @var GoogleConnection|null $connection */
-        $connection = GoogleConnection::query()
-            ->where( 'user_id', $user->getAuthIdentifier() )
-            ->where( 'status', GoogleConnection::STATUS_CONNECTED )
-            ->orderByDesc( 'updated_at' )
-            ->first();
+        $connection = app( GoogleConnectionResolver::class )->forUser( $user );
 
         if ( null === $connection ) {
             return response()->json( [
@@ -87,5 +82,27 @@ class GaOverviewController
                 'message' => $e->getMessage(),
             ], 502 );
         }
+    }
+
+    /**
+     * Clamp the caller-supplied `days` parameter to the range GA4 will
+     * respond to in a reasonable time. Rejects arrays / non-numeric
+     * inputs by falling back to the 30-day default.
+     *
+     * @since 1.0.0
+     */
+    protected function clampDays( mixed $raw ): int
+    {
+        if ( ! is_scalar( $raw ) ) {
+            return 30;
+        }
+
+        $days = (int) $raw;
+
+        if ( $days < 1 ) {
+            return 1;
+        }
+
+        return min( $days, DateRange::MAX_DAYS );
     }
 }

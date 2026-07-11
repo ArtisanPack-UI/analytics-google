@@ -14,6 +14,7 @@ declare( strict_types=1 );
 namespace ArtisanPackUI\AnalyticsGoogle\Reporting;
 
 use ArtisanPackUI\Google\Models\GoogleConnection;
+use Illuminate\Support\Carbon;
 
 /**
  * Pulls the four headline metrics (sessions, users, page views, avg
@@ -123,13 +124,21 @@ class GaOverviewFetcher
 
     /**
      * GA4 returns "date" as YYYYMMDD; reshape to YYYY-MM-DD for display.
+     * Parses via Carbon so impossible calendar dates (e.g. "20260230")
+     * are rejected instead of reshaped into invalid output.
      */
     protected function normalizeDate( string $raw ): string
     {
-        if ( 8 === strlen( $raw ) && ctype_digit( $raw ) ) {
-            return substr( $raw, 0, 4 ) . '-' . substr( $raw, 4, 2 ) . '-' . substr( $raw, 6, 2 );
+        if ( 8 !== strlen( $raw ) || ! ctype_digit( $raw ) ) {
+            return $raw;
         }
 
-        return $raw;
+        $parsed = Carbon::createFromFormat( '!Ymd', $raw );
+
+        if ( null === $parsed || $parsed->format( 'Ymd' ) !== $raw ) {
+            return $raw;
+        }
+
+        return $parsed->format( 'Y-m-d' );
     }
 }

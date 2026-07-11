@@ -16,9 +16,12 @@ namespace ArtisanPackUI\AnalyticsGoogle\Reporting;
 use ArtisanPackUI\AnalyticsGoogle\Exceptions\BaseNotInstalledException;
 use ArtisanPackUI\AnalyticsGoogle\Exceptions\ReportingException;
 use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
+use ArtisanPackUI\Google\Exceptions\TokenRefreshException;
 use ArtisanPackUI\Google\Models\GoogleConnection;
 use ArtisanPackUI\Google\Tokens\TokenManager;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
@@ -39,6 +42,7 @@ class Ga4DataClient
         protected ConfigRepository $config,
         protected HttpFactory $http,
         protected ?TokenManager $tokens = null,
+        protected ?CacheRepository $cache = null,
     ) {
     }
 
@@ -73,7 +77,23 @@ class Ga4DataClient
             throw BaseNotInstalledException::forReporting();
         }
 
-        $accessToken = $this->tokens->getValidAccessToken( $connection );
+        $payload  = $request->toApiPayload();
+        $cacheKey = $this->cacheKey( $connection, $property, $payload );
+        $cacheTtl = (int) $this->config->get( 'analytics-google.reporting.cache_ttl', 0 );
+
+        if ( $cacheTtl > 0 && null !== $this->cache && $this->cache->has( $cacheKey ) ) {
+            $cached = $this->cache->get( $cacheKey );
+
+            if ( is_array( $cached ) ) {
+                return new ReportResponse( $cached );
+            }
+        }
+
+        try {
+            $accessToken = $this->tokens->getValidAccessToken( $connection );
+        } catch ( TokenRefreshException $e ) {
+            throw ReportingException::authenticationFailed( $e );
+        }
 
         $apiBase = (string) $this->config->get(
             'analytics-google.reporting.api_base',
@@ -83,20 +103,29 @@ class Ga4DataClient
         $endpoint = sprintf( '%s/properties/%s:runReport', rtrim( $apiBase, '/' ), rawurlencode( $property ) );
         $timeout  = (int) $this->config->get( 'analytics-google.reporting.timeout', 30 );
 
-        $response = $this->http
-            ->timeout( $timeout )
-            ->withToken( $accessToken )
-            ->acceptJson()
-            ->asJson()
-            ->post( $endpoint, $request->toApiPayload() );
+        try {
+            $response = $this->http
+                ->timeout( $timeout )
+                ->withToken( $accessToken )
+                ->acceptJson()
+                ->asJson()
+                ->post( $endpoint, $payload );
+        } catch ( ConnectionException $e ) {
+            throw ReportingException::transportFailure( $e );
+        }
 
         if ( ! $response->successful() ) {
             throw ReportingException::apiError( $response->status(), (string) $response->body() );
         }
 
         $body = $response->json();
+        $body = is_array( $body ) ? $body : [];
 
-        return new ReportResponse( is_array( $body ) ? $body : [] );
+        if ( $cacheTtl > 0 && null !== $this->cache ) {
+            $this->cache->put( $cacheKey, $body, $cacheTtl );
+        }
+
+        return new ReportResponse( $body );
     }
 
     /**
@@ -110,6 +139,23 @@ class Ga4DataClient
     public function isAvailable(): bool
     {
         return BaseInstalled::check() && null !== $this->tokens;
+    }
+
+    /**
+     * Deterministic cache key for a (connection, property, payload)
+     * tuple. The connection identity is included so distinct users
+     * cannot see each other's cached rows.
+     *
+     * @param  array<string, mixed>  $payload
+     *
+     * @since 1.0.0
+     */
+    protected function cacheKey( GoogleConnection $connection, string $property, array $payload ): string
+    {
+        $connectionId = (string) ( $connection->getKey() ?? $connection->google_user_id ?? 'anon' );
+        $hash         = hash( 'sha256', $property . '|' . $connectionId . '|' . json_encode( $payload ) );
+
+        return 'analytics-google:runReport:' . $hash;
     }
 
     /**

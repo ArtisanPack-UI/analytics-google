@@ -103,37 +103,22 @@ class Gtag
         }
 
         $measurementId = (string) $this->measurementId();
-        $configJson    = json_encode(
-            $this->configOptions(),
-            JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT,
-        );
+        $safeJsonFlags = JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+        $configJson    = json_encode( $this->configOptions(), $safeJsonFlags );
 
         if ( false === $configJson ) {
             $configJson = '{}';
         }
 
-        $encodedId    = $this->escapeForJs( $measurementId );
+        $urlId        = rawurlencode( $measurementId );
+        $jsId         = json_encode( $measurementId, $safeJsonFlags );
         $consentGuard = $this->respectsConsent()
             ? "if(!window.__apAnalyticsConsent||window.__apAnalyticsConsent.analytics!==true){gtag('consent','default',{analytics_storage:'denied'});}"
             : '';
 
         return <<<HTML
-<script async src="https://www.googletagmanager.com/gtag/js?id={$encodedId}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());{$consentGuard}gtag('config','{$encodedId}',{$configJson});</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={$urlId}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());{$consentGuard}gtag('config',{$jsId},{$configJson});</script>
 HTML;
-    }
-
-    /**
-     * Escape a value for interpolation inside a JavaScript string.
-     *
-     * @since 1.0.0
-     */
-    protected function escapeForJs( string $value ): string
-    {
-        return str_replace(
-            [ '\\', "'", '"', "\n", "\r", '<', '>' ],
-            [ '\\\\', "\\'", '\\"', '\\n', '\\r', '\\u003C', '\\u003E' ],
-            $value,
-        );
     }
 }

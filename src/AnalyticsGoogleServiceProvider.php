@@ -23,6 +23,7 @@ namespace ArtisanPackUI\AnalyticsGoogle;
 use ArtisanPackUI\AnalyticsGoogle\Providers\Ga4Provider;
 use ArtisanPackUI\AnalyticsGoogle\Reporting\Ga4DataClient;
 use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
+use ArtisanPackUI\AnalyticsGoogle\Support\GoogleConnectionResolver;
 use ArtisanPackUI\AnalyticsGoogle\Tracking\Gtag;
 use ArtisanPackUI\Google\Tokens\TokenManager;
 use Illuminate\Contracts\Foundation\Application;
@@ -47,6 +48,8 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
 
         $this->app->singleton( Gtag::class, fn ( Application $app ): Gtag => new Gtag( $app[ 'config' ] ) );
 
+        $this->app->singleton( GoogleConnectionResolver::class, fn (): GoogleConnectionResolver => new GoogleConnectionResolver() );
+
         $this->app->singleton( Ga4Provider::class, fn ( Application $app ): Ga4Provider => new Ga4Provider(
             $app[ 'config' ],
             $app->make( Gtag::class ),
@@ -56,6 +59,7 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
             $app[ 'config' ],
             $app->make( HttpFactory::class ),
             BaseInstalled::check() ? $app->make( TokenManager::class ) : null,
+            $app->make( 'cache.store' ),
         ) );
 
         $this->app->singleton( 'analytics-google', function ( Application $app ): AnalyticsGoogle {

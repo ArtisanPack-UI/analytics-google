@@ -87,6 +87,36 @@ it( 'parses totals and trend rows from two GA4 calls', function (): void {
     ] );
 } );
 
+it( 'leaves impossible calendar dates unmangled instead of reshaping them into invalid output', function (): void {
+    $totalsResponse = [
+        'metricHeaders' => [ [ 'name' => 'sessions' ] ],
+        'rows'          => [ [ 'metricValues' => [ [ 'value' => '0' ] ] ] ],
+    ];
+
+    $trendResponse = [
+        'dimensionHeaders' => [ [ 'name' => 'date' ] ],
+        'metricHeaders'    => [ [ 'name' => 'sessions' ] ],
+        'rows'             => [
+            [
+                'dimensionValues' => [ [ 'value' => '20260230' ] ],
+                'metricValues'    => [ [ 'value' => '5' ] ],
+            ],
+        ],
+    ];
+
+    Http::fakeSequence()
+        ->push( $totalsResponse, 200 )
+        ->push( $trendResponse, 200 );
+
+    $fetcher = new GaOverviewFetcher(
+        new Ga4DataClient( app( 'config' ), app( HttpFactory::class ), makeStubTokenManager( 'x' ) ),
+    );
+
+    $overview = $fetcher->fetch( makeStubConnection(), DateRange::lastDays( 1 ) );
+
+    expect( $overview->trend[0]['date'] )->toBe( '20260230' );
+} );
+
 function makeStubTokenManager( string $token ): TokenManager
 {
     return new class( $token ) extends TokenManager {

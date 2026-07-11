@@ -20,9 +20,11 @@ use ArtisanPackUI\AnalyticsGoogle\Reporting\Ga4DataClient;
 use ArtisanPackUI\AnalyticsGoogle\Reporting\GaOverviewData;
 use ArtisanPackUI\AnalyticsGoogle\Reporting\GaOverviewFetcher;
 use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
+use ArtisanPackUI\AnalyticsGoogle\Support\GoogleConnectionResolver;
 use ArtisanPackUI\Google\Models\GoogleConnection;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
+use Throwable;
 
 /**
  * Renders the GA overview surface: four headline metrics and a daily
@@ -75,7 +77,7 @@ class GaOverview extends Component
 
     public function mount( int $days = 30, ?string $propertyId = null ): void
     {
-        $this->days          = max( 1, $days );
+        $this->days          = $this->clampDays( $days );
         $this->propertyId    = $propertyId;
         $this->baseInstalled = BaseInstalled::check();
 
@@ -91,7 +93,7 @@ class GaOverview extends Component
      */
     public function updatedDays( int $value ): void
     {
-        $this->days = max( 1, $value );
+        $this->days = $this->clampDays( $value );
         $this->refresh();
     }
 
@@ -134,6 +136,8 @@ class GaOverview extends Component
             $this->baseInstalled = false;
         } catch ( ReportingException $e ) {
             $this->errorMessage = $e->getMessage();
+        } catch ( Throwable $e ) {
+            $this->errorMessage = __( 'Could not load analytics: :message', [ 'message' => $e->getMessage() ] );
         }
     }
 
@@ -143,32 +147,30 @@ class GaOverview extends Component
     }
 
     /**
+     * Clamp days into the range GA4 will answer quickly. Prevents an
+     * authenticated user from binding an arbitrarily large value and
+     * forcing multi-decade lookups on every wire:poll.
+     *
+     * @since 1.0.0
+     */
+    protected function clampDays( int $days ): int
+    {
+        return max( 1, min( $days, DateRange::MAX_DAYS ) );
+    }
+
+    /**
      * Resolve the GoogleConnection the component uses to hit GA4.
      *
-     * Default behaviour: return the current user's first `connected`
-     * connection. Applications can override the binding for
-     * {@see GoogleConnectionResolver} at container level, or extend
-     * this component if they need site- or tenant-scoped selection.
+     * Delegates to {@see GoogleConnectionResolver}; applications with
+     * multi-property or tenant-scoped needs can override the container
+     * binding for that class to affect both this component and the
+     * HTTP endpoint that backs the React/Vue overview.
      *
      * @since 1.0.0
      */
     protected function resolveConnection(): ?GoogleConnection
     {
-        if ( ! class_exists( GoogleConnection::class ) ) {
-            return null;
-        }
-
-        $user = auth()->user();
-
-        if ( null === $user || ! method_exists( $user, 'getAuthIdentifier' ) ) {
-            return null;
-        }
-
-        return GoogleConnection::query()
-            ->where( 'user_id', $user->getAuthIdentifier() )
-            ->where( 'status', GoogleConnection::STATUS_CONNECTED )
-            ->orderByDesc( 'updated_at' )
-            ->first();
+        return app( GoogleConnectionResolver::class )->forUser( auth()->user() );
     }
 
     protected function applyOverview( GaOverviewData $overview ): void

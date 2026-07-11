@@ -211,3 +211,7 @@ The package is deliberately safe to install without the base:
 ## Contributing
 
 Please [read through the contributing guidelines](CONTRIBUTING.md) to learn more about how you can contribute to this project.
+
+## License
+
+ArtisanPack UI Analytics Google is open-source software licensed under the [MIT license](LICENSE).

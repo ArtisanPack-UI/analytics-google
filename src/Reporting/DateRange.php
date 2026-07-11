@@ -27,6 +27,13 @@ use Throwable;
  */
 final class DateRange
 {
+    /**
+     * Upper bound on the days-back window this class will build. GA4 keeps
+     * two years of standard event data by default; anything wider is
+     * almost certainly a mis-plumbed input rather than a real query.
+     */
+    public const MAX_DAYS = 730;
+
     private const RELATIVE_PATTERN = '/^(today|yesterday|\d+daysAgo)$/i';
 
     /**
@@ -50,6 +57,10 @@ final class DateRange
     {
         if ( $days < 1 ) {
             throw new InvalidArgumentException( 'DateRange::lastDays expects a positive day count.' );
+        }
+
+        if ( $days > self::MAX_DAYS ) {
+            $days = self::MAX_DAYS;
         }
 
         return new self( ( $days - 1 ) . 'daysAgo', 'today' );

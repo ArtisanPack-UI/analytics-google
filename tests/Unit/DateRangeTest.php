@@ -42,3 +42,10 @@ it( 'rejects an unparseable calendar date', function (): void {
 it( 'rejects lastDays with a non-positive count', function (): void {
     expect( fn () => DateRange::lastDays( 0 ) )->toThrow( InvalidArgumentException::class );
 } );
+
+it( 'clamps lastDays to MAX_DAYS so an authenticated user cannot force a decade-wide query', function (): void {
+    $range = DateRange::lastDays( 100000 );
+
+    expect( $range->startDate )->toBe( ( DateRange::MAX_DAYS - 1 ) . 'daysAgo' );
+    expect( $range->endDate )->toBe( 'today' );
+} );

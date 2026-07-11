@@ -14,6 +14,7 @@ declare( strict_types=1 );
 namespace ArtisanPackUI\AnalyticsGoogle\Exceptions;
 
 use RuntimeException;
+use Throwable;
 
 /**
  * Wraps low-level HTTP or configuration failures encountered while
@@ -56,5 +57,37 @@ class ReportingException extends RuntimeException
             'status' => $status,
             'body'   => $body,
         ] ) );
+    }
+
+    /**
+     * Raised when the OAuth token could not be refreshed / is no longer
+     * valid — surfaced separately so callers can prompt the user to
+     * reconnect the Google account instead of blaming GA4.
+     *
+     * @since 1.0.0
+     */
+    public static function authenticationFailed( Throwable $previous ): self
+    {
+        return new self(
+            __( 'Reconnect your Google account to continue viewing analytics.' ),
+            0,
+            $previous,
+        );
+    }
+
+    /**
+     * Raised when the Data API call itself could not be delivered
+     * (connection refused, DNS failure, timeout) — the transport layer
+     * failed before any HTTP status was received.
+     *
+     * @since 1.0.0
+     */
+    public static function transportFailure( Throwable $previous ): self
+    {
+        return new self(
+            __( 'Could not reach the GA4 Data API: :message', [ 'message' => $previous->getMessage() ] ),
+            0,
+            $previous,
+        );
     }
 }

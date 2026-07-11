@@ -25,7 +25,7 @@ it( 'renders the gtag.js snippet with the configured measurement ID', function (
     $snippet = app( Gtag::class )->render();
 
     expect( $snippet )->toContain( 'https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345' )
-        ->and( $snippet )->toContain( "gtag('config','G-ABCDE12345'" );
+        ->and( $snippet )->toContain( 'gtag(\'config\',"G-ABCDE12345"' );
 } );
 
 it( 'emits a consent-default guard when consent is respected', function (): void {

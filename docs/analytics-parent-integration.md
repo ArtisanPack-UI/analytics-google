@@ -78,7 +78,7 @@ if ( ! interface_exists( \ArtisanPackUI\Analytics\Contracts\AnalyticsProviderInt
 Two independent mechanisms combine when the parent is installed:
 
 1. **Provider gate** — the parent only emits enabled providers' tracker scripts after the user has granted consent. If the user rejects, `@analyticsScripts` skips this package's snippet entirely.
-2. **Built-in `respect_consent` guard** — even if the snippet does end up on the page, the emitted `gtag('consent', 'default', …)` respects `window.__apAnalyticsConsent.analytics`. See [[Client-Side Tracking/Consent Integration|Consent Integration]].
+2. **Built-in `respect_consent` guard** — even if the snippet does end up on the page, the emitted `gtag('consent', 'default', …)` respects `window.__apAnalyticsConsent.analytics`. See [Consent Integration](Client-Side-Tracking-Consent-Integration).
 
 In practice the two agree: the parent writes `window.__apAnalyticsConsent` when it grants the category and, at the same time, includes the provider in its output. The double guard means a race between the two mechanisms cannot briefly fire tracking against a user who hasn't consented.
 
@@ -88,6 +88,6 @@ The package still boots, the `Ga4Provider` still exists in the container, and `A
 
 ## Related
 
-- [[Client-Side Tracking/Consent Integration|Consent Integration]] — the browser-side consent flag details.
-- [[API Reference/GA4 Provider|`Ga4Provider`]] — the provider class this adapter delegates to.
-- [[Configuration]] — the `provider_name` key.
+- [Consent Integration](Client-Side-Tracking-Consent-Integration) — the browser-side consent flag details.
+- [`Ga4Provider`](API-Reference-GA4-Provider) — the provider class this adapter delegates to.
+- [Configuration](Configuration) — the `provider_name` key.

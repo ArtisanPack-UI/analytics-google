@@ -4,7 +4,7 @@ title: React
 
 # React — `Ga4Snippet`
 
-`Ga4Snippet` is the React equivalent of the [[Client-Side Tracking/Blade|`@ga4Snippet`]] directive. It injects the gtag.js snippet into `<head>` on mount and renders `null` — no DOM footprint of its own.
+`Ga4Snippet` is the React equivalent of the [`@ga4Snippet`](Client-Side-Tracking-Blade) directive. It injects the gtag.js snippet into `<head>` on mount and renders `null` — no DOM footprint of its own.
 
 ## Publish the source
 
@@ -59,7 +59,7 @@ interface InstallGa4Options {
 
 ## Related
 
-- [[Client-Side Tracking/Blade|Blade]] — server-rendered equivalent.
-- [[Client-Side Tracking/Vue|Vue]] — same component, Vue flavor.
-- [[Client-Side Tracking/Consent Integration|Consent Integration]] — how `respectConsent` interacts with the analytics parent.
-- [[API Reference/Helpers|Helpers]] — the `installGa4Snippet` shared client.
+- [Blade](Client-Side-Tracking-Blade) — server-rendered equivalent.
+- [Vue](Client-Side-Tracking-Vue) — same component, Vue flavor.
+- [Consent Integration](Client-Side-Tracking-Consent-Integration) — how `respectConsent` interacts with the analytics parent.
+- [Helpers](API-Reference-Helpers) — the `installGa4Snippet` shared client.

@@ -8,18 +8,18 @@ The public surface of `artisanpack-ui/analytics-google`.
 
 Sub-pages by class or namespace:
 
-- [[API Reference/Analytics Google|`AnalyticsGoogle` — the facade / helper root]]
-- [[API Reference/GA4 Data Client|`Ga4DataClient`]]
-- [[API Reference/Report Request|`ReportRequest`]]
-- [[API Reference/Report Response|`ReportResponse`]]
-- [[API Reference/Date Range|`DateRange`]]
-- [[API Reference/GA Overview Fetcher|`GaOverviewFetcher`]]
-- [[API Reference/GA Top Content Fetcher|`GaTopContentFetcher`]]
-- [[API Reference/GA Overview Data|`GaOverviewData`]]
-- [[API Reference/GA Top Content Data|`GaTopContentData`]]
-- [[API Reference/GA4 Provider|`Ga4Provider` and adapter]]
-- [[API Reference/Exceptions|Exceptions]]
-- [[API Reference/Helpers|Helpers, facades, and the `Gtag` service]]
+- [`AnalyticsGoogle` — the facade / helper root](API-Reference-Analytics-Google)
+- [`Ga4DataClient`](API-Reference-GA4-Data-Client)
+- [`ReportRequest`](API-Reference-Report-Request)
+- [`ReportResponse`](API-Reference-Report-Response)
+- [`DateRange`](API-Reference-Date-Range)
+- [`GaOverviewFetcher`](API-Reference-GA-Overview-Fetcher)
+- [`GaTopContentFetcher`](API-Reference-GA-Top-Content-Fetcher)
+- [`GaOverviewData`](API-Reference-GA-Overview-Data)
+- [`GaTopContentData`](API-Reference-GA-Top-Content-Data)
+- [`Ga4Provider` and adapter](API-Reference-GA4-Provider)
+- [Exceptions](API-Reference-Exceptions)
+- [Helpers, facades, and the `Gtag` service](API-Reference-Helpers)
 
 ## The facade
 
@@ -53,7 +53,7 @@ The service provider registers:
 | `Reporting\Ga4DataClient::class` | `Reporting\Ga4DataClient` (with `TokenManager` when the base is installed, `null` otherwise) | Singleton |
 | `Support\GoogleConnectionResolver::class` | `Support\GoogleConnectionResolver` | Singleton |
 
-Rebind any of these to customize behavior. The most common override is `GoogleConnectionResolver` for multi-property / multi-tenant apps — see [[API Reference/Analytics Google|`GoogleConnectionResolver`]].
+Rebind any of these to customize behavior. The most common override is `GoogleConnectionResolver` for multi-property / multi-tenant apps — see [`GoogleConnectionResolver`](API-Reference-Analytics-Google).
 
 ## Namespace map
 
@@ -98,7 +98,7 @@ ArtisanPackUI\AnalyticsGoogle\
 
 ## Public routes
 
-Reference: [[HTTP Endpoints]].
+Reference: [HTTP Endpoints](HTTP-Endpoints).
 
 ## Public views
 
@@ -138,4 +138,4 @@ Publish with `--tag=analytics-google-views`.
 | `analytics-google-top-content` | `CmsFramework\GaTopContentWidget` | Same. |
 
 ---
-Continue to [[Testing]] →
+Continue to [Testing](Testing) →

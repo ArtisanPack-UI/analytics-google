@@ -6,7 +6,7 @@ title: ReportResponse
 
 `ArtisanPackUI\AnalyticsGoogle\Reporting\ReportResponse` — immutable, readonly `final` wrapper over the raw JSON body returned by the GA4 Data API.
 
-Full narrative usage: [[Server-Side Reporting/Report Request|Report Request and Response]]. This page is the mechanical reference.
+Full narrative usage: [Report Request and Response](Server-Side-Reporting-Report-Request). This page is the mechanical reference.
 
 ## Constructor
 
@@ -49,5 +49,5 @@ Sum a single metric across every row. Non-numeric values are skipped; a metric a
 
 ## Related
 
-- [[API Reference/Report Request|`ReportRequest`]]
-- [[API Reference/GA4 Data Client|`Ga4DataClient`]]
+- [`ReportRequest`](API-Reference-Report-Request)
+- [`Ga4DataClient`](API-Reference-GA4-Data-Client)

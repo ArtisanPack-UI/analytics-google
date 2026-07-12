@@ -72,6 +72,6 @@ DateRange::lastDays( 7 )->toArray();
 
 ## Related
 
-- [[Server-Side Reporting/Report Request|`ReportRequest` and `ReportResponse`]]
-- [[Server-Side Reporting/GA4 Data Client|`Ga4DataClient`]]
-- [[API Reference/Date Range|API Reference — `DateRange`]]
+- [`ReportRequest` and `ReportResponse`](Server-Side-Reporting-Report-Request)
+- [`Ga4DataClient`](Server-Side-Reporting-GA4-Data-Client)
+- [API Reference — `DateRange`](API-Reference-Date-Range)

@@ -69,6 +69,6 @@ The Livewire, React, and Vue reporting components hit `Ga4DataClient` via `GaOve
 
 ## Related
 
-- [[Server-Side Reporting/GA4 Data Client|`Ga4DataClient`]]
-- [[Installation/Configuration|Configuration reference]] — the `cache_ttl` key in context.
-- [[Testing]] — patterns for testing caching behavior.
+- [`Ga4DataClient`](Server-Side-Reporting-GA4-Data-Client)
+- [Configuration reference](Installation-Configuration) — the `cache_ttl` key in context.
+- [Testing](Testing) — patterns for testing caching behavior.

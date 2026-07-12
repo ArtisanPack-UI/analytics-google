@@ -47,7 +47,7 @@ Filter to a single file or test:
 ./vendor/bin/pest --filter="runs a report"
 ```
 
-The test suite uses Orchestra Testbench with an in-memory SQLite database. See [[Testing]] for reusable patterns.
+The test suite uses Orchestra Testbench with an in-memory SQLite database. See [Testing](Testing) for reusable patterns.
 
 ## Code style
 
@@ -66,7 +66,7 @@ The docs under `/docs` follow the same conventions as the sibling packages:
 
 - Every markdown file starts with YAML front matter containing at least `title`.
 - Every subdirectory has a sibling `.md` file with the same name serving as its index page.
-- Cross-links use GitLab wiki style: `[[Page Name]]` or `[[Slug Path|Label]]`.
+- Cross-links use GitLab wiki slug style: `[Display Text](Page-Slug)` where the slug is the file path relative to `docs/` with `/` replaced by `-`, no `.md` extension (e.g. `docs/installation/requirements.md` → `Installation-Requirements`).
 - Real content only — no placeholder text.
 
 ## Package layout to know about
@@ -84,5 +84,5 @@ The docs under `/docs` follow the same conventions as the sibling packages:
 
 ## Related
 
-- [[Testing]] — patterns for testing the package and code that uses it.
-- [[API Reference]] — the public surface at a glance.
+- [Testing](Testing) — patterns for testing the package and code that uses it.
+- [API Reference](API-Reference) — the public surface at a glance.

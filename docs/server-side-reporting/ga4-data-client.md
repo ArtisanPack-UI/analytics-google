@@ -26,11 +26,11 @@ public function runReport(
 
 Executes a single `runReport` call against the GA4 Data API.
 
-- **`$request`** — a [[Server-Side Reporting/Report Request|`ReportRequest`]] describing the metrics, dimensions, date range, ordering, limit, and offset.
-- **`$connection`** — the [[../api-reference/ga4-provider|`GoogleConnection`]] whose access token to use. In practice, resolved via the [[API Reference/Analytics Google|`GoogleConnectionResolver`]].
+- **`$request`** — a [`ReportRequest`](Server-Side-Reporting-Report-Request) describing the metrics, dimensions, date range, ordering, limit, and offset.
+- **`$connection`** — the [`GoogleConnection`](API-Reference-GA4-Provider) whose access token to use. In practice, resolved via the [`GoogleConnectionResolver`](API-Reference-Analytics-Google).
 - **`$propertyId`** — optional override. Defaults to `analytics-google.reporting.property_id`.
 
-Returns a [[Server-Side Reporting/Report Request|`ReportResponse`]].
+Returns a [`ReportResponse`](Server-Side-Reporting-Report-Request).
 
 ### Example
 
@@ -56,11 +56,11 @@ foreach ( $response->rows() as $row ) {
 
 ### Errors
 
-- [[API Reference/Exceptions|`BaseNotInstalledException`]] — the base package is missing. Detected via `BaseInstalled::check()` before any HTTP work.
-- [[API Reference/Exceptions|`ReportingException::missingConfiguration()`]] — `property_id` is unset and no `$propertyId` override was passed.
-- [[API Reference/Exceptions|`ReportingException::authenticationFailed()`]] — the base's `TokenManager` threw `TokenRefreshException`. The user needs to reconnect.
-- [[API Reference/Exceptions|`ReportingException::transportFailure()`]] — the request could not be delivered (DNS, connection refused, timeout).
-- [[API Reference/Exceptions|`ReportingException::apiError()`]] — the API returned a non-2xx status. Body is preserved in the message.
+- [`BaseNotInstalledException`](API-Reference-Exceptions) — the base package is missing. Detected via `BaseInstalled::check()` before any HTTP work.
+- [`ReportingException::missingConfiguration()`](API-Reference-Exceptions) — `property_id` is unset and no `$propertyId` override was passed.
+- [`ReportingException::authenticationFailed()`](API-Reference-Exceptions) — the base's `TokenManager` threw `TokenRefreshException`. The user needs to reconnect.
+- [`ReportingException::transportFailure()`](API-Reference-Exceptions) — the request could not be delivered (DNS, connection refused, timeout).
+- [`ReportingException::apiError()`](API-Reference-Exceptions) — the API returned a non-2xx status. Body is preserved in the message.
 
 ## `isAvailable()`
 
@@ -78,7 +78,7 @@ if ( $client->isAvailable() ) {
 
 ## Caching
 
-`Ga4DataClient` writes successful responses to Laravel's default cache store when `analytics-google.reporting.cache_ttl` is greater than zero. Cache keys hash `(connection identity, property, request payload)` so users cannot see each other's cached rows. Full details: [[Server-Side Reporting/Caching|Caching]].
+`Ga4DataClient` writes successful responses to Laravel's default cache store when `analytics-google.reporting.cache_ttl` is greater than zero. Cache keys hash `(connection identity, property, request payload)` so users cannot see each other's cached rows. Full details: [Caching](Server-Side-Reporting-Caching).
 
 ## Timeouts
 
@@ -110,8 +110,8 @@ Rebind if you want a different HTTP factory (for example, one with fake response
 
 ## Related
 
-- [[Server-Side Reporting/Report Request|`ReportRequest` and `ReportResponse`]]
-- [[Server-Side Reporting/Date Ranges|`DateRange`]]
-- [[Server-Side Reporting/Caching|Caching]]
-- [[Server-Side Reporting/Graceful Degradation|Graceful degradation]]
-- [[API Reference/GA4 Data Client|API Reference — `Ga4DataClient`]]
+- [`ReportRequest` and `ReportResponse`](Server-Side-Reporting-Report-Request)
+- [`DateRange`](Server-Side-Reporting-Date-Ranges)
+- [Caching](Server-Side-Reporting-Caching)
+- [Graceful degradation](Server-Side-Reporting-Graceful-Degradation)
+- [API Reference — `Ga4DataClient`](API-Reference-GA4-Data-Client)

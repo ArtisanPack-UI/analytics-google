@@ -11,7 +11,7 @@ The package ships two reporting surfaces, each rendered in three frameworks:
 | **GA Overview** | Sessions, users, page views, avg engagement + daily trend chart. | `<livewire:analytics-google::ga-overview />` | `<GaOverview />` | `<GaOverview />` |
 | **Top Content** | Top pages by views + top events by count. | `<livewire:analytics-google::ga-top-content />` | `<GaTopContent />` | `<GaTopContent />` |
 
-All three frameworks share one HTTP endpoint per surface (see [[HTTP Endpoints]]), so numbers cannot drift.
+All three frameworks share one HTTP endpoint per surface (see [HTTP Endpoints](HTTP-Endpoints)), so numbers cannot drift.
 
 ## Requirements
 
@@ -21,13 +21,13 @@ Both surfaces require:
 - Server-side: `analytics-google.reporting.property_id` configured.
 - Livewire surfaces additionally require [`livewire/livewire`](https://livewire.laravel.com/) `^3.6`.
 
-When the base is missing, each surface renders an "install the base" prompt instead of blowing up. See [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]].
+When the base is missing, each surface renders an "install the base" prompt instead of blowing up. See [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation).
 
 ## Component pages
 
-- [[Components/GA Overview|GA Overview — Livewire, React, Vue]]
-- [[Components/GA Top Content|GA Top Content — Livewire, React, Vue]]
-- [[Components/CMS Framework Widgets|CMS Framework Admin Widgets]]
+- [GA Overview — Livewire, React, Vue](Components-GA-Overview)
+- [GA Top Content — Livewire, React, Vue](Components-GA-Top-Content)
+- [CMS Framework Admin Widgets](Components-CMS-Framework-Widgets)
 
 ## Publishing the JS sources
 
@@ -49,6 +49,6 @@ Copies `livewire/ga-overview.blade.php` and `livewire/ga-top-content.blade.php` 
 
 ## Related
 
-- [[HTTP Endpoints]] — response shapes, error codes, and query parameters.
-- [[Server-Side Reporting]] — the fetchers behind every surface.
-- [[Configuration]] — the `routes.*` keys that control endpoint mounting.
+- [HTTP Endpoints](HTTP-Endpoints) — response shapes, error codes, and query parameters.
+- [Server-Side Reporting](Server-Side-Reporting) — the fetchers behind every surface.
+- [Configuration](Configuration) — the `routes.*` keys that control endpoint mounting.

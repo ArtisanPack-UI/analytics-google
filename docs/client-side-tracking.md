@@ -40,11 +40,11 @@ To fire tracking unconditionally, set:
 ],
 ```
 
-Full details: [[Client-Side Tracking/Consent Integration|Consent Integration]].
+Full details: [Consent Integration](Client-Side-Tracking-Consent-Integration).
 
 ## Deeper topics
 
-- [[Client-Side Tracking/Blade|Blade — `@ga4Snippet`]]
-- [[Client-Side Tracking/React|React — `Ga4Snippet`]]
-- [[Client-Side Tracking/Vue|Vue — `Ga4Snippet`]]
-- [[Client-Side Tracking/Consent Integration|Consent Integration with the analytics parent]]
+- [Blade — `@ga4Snippet`](Client-Side-Tracking-Blade)
+- [React — `Ga4Snippet`](Client-Side-Tracking-React)
+- [Vue — `Ga4Snippet`](Client-Side-Tracking-Vue)
+- [Consent Integration with the analytics parent](Client-Side-Tracking-Consent-Integration)

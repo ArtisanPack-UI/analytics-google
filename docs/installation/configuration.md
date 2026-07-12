@@ -38,7 +38,7 @@ The published file is the source of truth — this page mirrors it and explains 
 - **`config`** — Extra `gtag('config', ...)` options serialized to JSON in the emitted snippet. Keep values to primitives (strings, bools, numbers) — the encoder uses `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT` so nothing can break out of the surrounding `<script>` tag, but complex objects still make the resulting snippet noisy.
 - **`respect_consent`** — When `true` (default), the emitted snippet sets `gtag('consent', 'default', { analytics_storage: 'denied' })` unless `window.__apAnalyticsConsent.analytics === true`. Set to `false` to fire tracking unconditionally on every page load.
 
-Full details on the emitted markup and the consent flag: [[Client-Side Tracking]] and [[Client-Side Tracking/Consent Integration|Consent Integration]].
+Full details on the emitted markup and the consent flag: [Client-Side Tracking](Client-Side-Tracking) and [Consent Integration](Client-Side-Tracking-Consent-Integration).
 
 ## Server-side reporting
 
@@ -51,9 +51,9 @@ Full details on the emitted markup and the consent flag: [[Client-Side Tracking]
 ],
 ```
 
-- **`property_id`** — The GA4 numeric property ID Data API queries target. Overridable per call via the third argument to `Ga4DataClient::runReport()`. Missing when a query runs → [[API Reference/Exceptions|`ReportingException::missingConfiguration()`]].
+- **`property_id`** — The GA4 numeric property ID Data API queries target. Overridable per call via the third argument to `Ga4DataClient::runReport()`. Missing when a query runs → [`ReportingException::missingConfiguration()`](API-Reference-Exceptions).
 - **`api_base`** — Base URL for the GA4 Data API. Rarely needs to change; kept configurable so tests can point at a fake server.
-- **`timeout`** — Request timeout for a single `runReport` call, in seconds. Trips a [[API Reference/Exceptions|`ReportingException::transportFailure()`]] on `ConnectionException`.
+- **`timeout`** — Request timeout for a single `runReport` call, in seconds. Trips a [`ReportingException::transportFailure()`](API-Reference-Exceptions) on `ConnectionException`.
 - **`cache_ttl`** — Cache TTL in seconds. Set to `0` to disable caching. Cache keys are hashed from `(connection identity, property ID, request payload)` so distinct users cannot see each other's cached rows.
 
 ## Provider registration
@@ -62,7 +62,7 @@ Full details on the emitted markup and the consent flag: [[Client-Side Tracking]
 'provider_name' => 'google-ga4',
 ```
 
-- **`provider_name`** — The name this package registers under with the [`artisanpack-ui/analytics`](https://github.com/ArtisanPack-UI/analytics) parent's `extend()` API. Add this name to `artisanpack.analytics.active_providers` on the parent to route tracking through its consent gate. See [[Analytics Parent Integration]].
+- **`provider_name`** — The name this package registers under with the [`artisanpack-ui/analytics`](https://github.com/ArtisanPack-UI/analytics) parent's `extend()` API. Add this name to `artisanpack.analytics.active_providers` on the parent to route tracking through its consent gate. See [Analytics Parent Integration](Analytics-Parent-Integration).
 
 ## OAuth scopes
 
@@ -88,10 +88,10 @@ Full details on the emitted markup and the consent flag: [[Client-Side Tracking]
 - **`prefix`** — Prefix mounted under `/`. Full route paths become `<prefix>/overview` and `<prefix>/top-content`.
 - **`middleware`** — Middleware stack applied to the two routes. `web` mounts them under the session guard the auth middleware needs; `auth` requires an authenticated user so the controllers can resolve a `GoogleConnection`.
 
-Full endpoint reference: [[HTTP Endpoints]].
+Full endpoint reference: [HTTP Endpoints](HTTP-Endpoints).
 
 ## Related pages
 
-- [[Installation/Environment Variables|Environment variables]] — every env var this package reads.
-- [[Configuration]] — the same content organized by task rather than by section.
-- [[HTTP Endpoints]] — response shapes and error codes for the two reporting routes.
+- [Environment variables](Installation-Environment-Variables) — every env var this package reads.
+- [Configuration](Configuration) — the same content organized by task rather than by section.
+- [HTTP Endpoints](HTTP-Endpoints) — response shapes and error codes for the two reporting routes.

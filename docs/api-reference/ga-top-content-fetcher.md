@@ -29,7 +29,7 @@ Runs two `runReport` calls:
 
 The `$limit` is clamped internally to `1..100` — callers can pass any int without needing to defensively bound it.
 
-Returns a [[API Reference/GA Top Content Data|`GaTopContentData`]] with `topPages` sorted by views descending and `topEvents` sorted by count descending.
+Returns a [`GaTopContentData`](API-Reference-GA-Top-Content-Data) with `topPages` sorted by views descending and `topEvents` sorted by count descending.
 
 **Throws** — every exception `Ga4DataClient::runReport()` throws.
 
@@ -50,5 +50,5 @@ $data->topEvents;  // list<{event, count, users}>
 
 ## Related
 
-- [[API Reference/GA Top Content Data|`GaTopContentData`]]
-- [[Components/GA Top Content|GA Top Content component]]
+- [`GaTopContentData`](API-Reference-GA-Top-Content-Data)
+- [GA Top Content component](Components-GA-Top-Content)

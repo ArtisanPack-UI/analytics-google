@@ -35,7 +35,7 @@ For server-side reporting, also install the base:
 composer require artisanpack-ui/google
 ```
 
-The package is deliberately safe to install without the base — see [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]].
+The package is deliberately safe to install without the base — see [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation).
 
 ## Publish the config
 
@@ -43,7 +43,7 @@ The package is deliberately safe to install without the base — see [[Server-Si
 php artisan vendor:publish --tag=analytics-google-config
 ```
 
-Copies `config/analytics-google.php` into your app. Every key is documented in [[Configuration]].
+Copies `config/analytics-google.php` into your app. Every key is documented in [Configuration](Configuration).
 
 ## Publish the views (optional)
 
@@ -67,7 +67,7 @@ Before server-side reporting works, you need an OAuth 2.0 client on a Google Clo
 
 The base [`artisanpack-ui/google`](https://github.com/ArtisanPack-UI/google) package owns the OAuth setup end-to-end; this package contributes the required scope via the `ap.google.scopes` filter hook, so the base's single consent screen covers GA4 alongside every other Google service you've enabled.
 
-Walkthrough with the extra GA4-specific steps: [[Installation/Google Cloud Setup|Google Cloud setup]].
+Walkthrough with the extra GA4-specific steps: [Google Cloud setup](Installation-Google-Cloud-Setup).
 
 ## Set the environment variables
 
@@ -79,7 +79,7 @@ GA4_MEASUREMENT_ID=G-XXXXXXX
 GA4_PROPERTY_ID=123456789
 ```
 
-Full env-var reference: [[Installation/Environment Variables|Environment variables]].
+Full env-var reference: [Environment variables](Installation-Environment-Variables).
 
 ## Apply route middleware (optional)
 
@@ -92,7 +92,7 @@ The package registers two web routes for the React and Vue reporting components.
 ],
 ```
 
-Route reference: [[HTTP Endpoints]].
+Route reference: [HTTP Endpoints](HTTP-Endpoints).
 
 ## Verify the install
 
@@ -122,10 +122,10 @@ Returns `true` once `GA4_MEASUREMENT_ID` is set.
 
 ## Deeper topics
 
-- [[Installation/Requirements|Requirements]] — PHP, Laravel, peer-package versions.
-- [[Installation/Configuration|Configuration]] — full `config/analytics-google.php` reference.
-- [[Installation/Environment Variables|Environment variables]] — every env var the package reads.
-- [[Installation/Google Cloud Setup|Google Cloud setup]] — GA4 property, Data API, and the base package's Cloud Console walkthrough.
+- [Requirements](Installation-Requirements) — PHP, Laravel, peer-package versions.
+- [Configuration](Installation-Configuration) — full `config/analytics-google.php` reference.
+- [Environment variables](Installation-Environment-Variables) — every env var the package reads.
+- [Google Cloud setup](Installation-Google-Cloud-Setup) — GA4 property, Data API, and the base package's Cloud Console walkthrough.
 
 ---
-Continue to [[Client-Side Tracking]] →
+Continue to [Client-Side Tracking](Client-Side-Tracking) →

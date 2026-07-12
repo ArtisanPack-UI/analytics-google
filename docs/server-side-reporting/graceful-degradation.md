@@ -25,7 +25,7 @@ The result is memoized so repeated calls do not walk the autoloader. Tests can r
 
 ## What fails cleanly
 
-- **`Ga4DataClient::runReport()`** — throws [[API Reference/Exceptions|`BaseNotInstalledException`]] before any HTTP work. The message is a plain-English `The artisanpack-ui/google base package is required for GA4 Data API reporting. Install it with 'composer require artisanpack-ui/google' to enable server-side reporting features.`
+- **`Ga4DataClient::runReport()`** — throws [`BaseNotInstalledException`](API-Reference-Exceptions) before any HTTP work. The message is a plain-English `The artisanpack-ui/google base package is required for GA4 Data API reporting. Install it with 'composer require artisanpack-ui/google' to enable server-side reporting features.`
 - **`Ga4DataClient::isAvailable()`** — returns `false`. Callers can check this to hide reporting UI cleanly instead of catching an exception.
 - **`AnalyticsGoogle::dataClient()`** — returns `null`. Callers can feature-detect via `if ( analyticsGoogle()->hasReporting() )` rather than checking `isAvailable()`.
 - **`AnalyticsGoogle::hasReporting()`** — returns `false`.
@@ -67,10 +67,10 @@ Under the hood it composes `Ga4DataClient::isAvailable()` (which itself calls `B
 | Reporting throws `Could not reach the GA4 Data API: …` | `ReportingException::transportFailure()` | Network / firewall issue. |
 | Reporting throws `GA4 Data API returned an error (status ...)` | `ReportingException::apiError()` | Read the body — usually a scope, property-access, or property-ID issue. |
 
-Full exception reference: [[API Reference/Exceptions|Exceptions]].
+Full exception reference: [Exceptions](API-Reference-Exceptions).
 
 ## Related
 
-- [[API Reference/Exceptions|Exceptions]]
-- [[HTTP Endpoints]] — the response-shape details of the `501` and other error codes.
-- [[Components]] — how the surfaces render the "install the base" prompt.
+- [Exceptions](API-Reference-Exceptions)
+- [HTTP Endpoints](HTTP-Endpoints) — the response-shape details of the `501` and other error codes.
+- [Components](Components) — how the surfaces render the "install the base" prompt.

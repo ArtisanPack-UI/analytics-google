@@ -12,7 +12,7 @@ Every env var the package reads, in one place.
 |---|---|---|---|
 | `GA4_MEASUREMENT_ID` | string | `null` | `analytics-google.tracking.measurement_id`. The GA4 measurement ID (`G-XXXXXXX`) used by the `@ga4Snippet` directive and the React/Vue `Ga4Snippet` components. Empty → tracker emits nothing. |
 | `GA4_TRACKING_ENABLED` | bool | `true` | `analytics-google.tracking.enabled`. Master switch for the tracker. Set to `false` to disable in staging / CI without unsetting the measurement ID. |
-| `GA4_PROPERTY_ID` | string | `null` | `analytics-google.reporting.property_id`. The numeric GA4 property ID Data API queries target. Missing → `Ga4DataClient::runReport()` throws [[API Reference/Exceptions|`ReportingException::missingConfiguration()`]]. |
+| `GA4_PROPERTY_ID` | string | `null` | `analytics-google.reporting.property_id`. The numeric GA4 property ID Data API queries target. Missing → `Ga4DataClient::runReport()` throws [`ReportingException::missingConfiguration()`](API-Reference-Exceptions). |
 
 ## Framework env vars this package leans on
 
@@ -35,7 +35,7 @@ These keys have no env fallback and must be set in `config/analytics-google.php`
 - `analytics-google.scopes` — Google OAuth scopes contributed to the base's registry.
 - `analytics-google.routes.enabled` / `.prefix` / `.middleware` — HTTP endpoint configuration.
 
-Full description of every key: [[Installation/Configuration|Configuration reference]].
+Full description of every key: [Configuration reference](Installation-Configuration).
 
 ## Example `.env`
 

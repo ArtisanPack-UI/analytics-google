@@ -4,7 +4,7 @@ title: Vue
 
 # Vue — `Ga4Snippet`
 
-`Ga4Snippet` is the Vue 3 equivalent of the [[Client-Side Tracking/Blade|`@ga4Snippet`]] directive. It injects the gtag.js snippet into `<head>` in an `onMounted` hook and renders nothing itself.
+`Ga4Snippet` is the Vue 3 equivalent of the [`@ga4Snippet`](Client-Side-Tracking-Blade) directive. It injects the gtag.js snippet into `<head>` in an `onMounted` hook and renders nothing itself.
 
 ## Publish the source
 
@@ -63,6 +63,6 @@ Vue's prop-name transformation applies — `measurementId` in JSX is `measuremen
 
 ## Related
 
-- [[Client-Side Tracking/Blade|Blade]] — server-rendered equivalent.
-- [[Client-Side Tracking/React|React]] — same component, React flavor.
-- [[Client-Side Tracking/Consent Integration|Consent Integration]] — how `respect-consent` interacts with the analytics parent.
+- [Blade](Client-Side-Tracking-Blade) — server-rendered equivalent.
+- [React](Client-Side-Tracking-React) — same component, React flavor.
+- [Consent Integration](Client-Side-Tracking-Consent-Integration) — how `respect-consent` interacts with the analytics parent.

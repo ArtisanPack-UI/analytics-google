@@ -6,7 +6,7 @@ title: DateRange
 
 `ArtisanPackUI\AnalyticsGoogle\Reporting\DateRange` — immutable, readonly `final` start/end date pair in the format the GA4 Data API expects.
 
-Full narrative usage: [[Server-Side Reporting/Date Ranges|Date Ranges]]. This page is the mechanical reference.
+Full narrative usage: [Date Ranges](Server-Side-Reporting-Date-Ranges). This page is the mechanical reference.
 
 ## Constants
 
@@ -44,5 +44,5 @@ Serialize to the shape the `runReport` `dateRanges` array expects.
 
 ## Related
 
-- [[Server-Side Reporting/Date Ranges|Date Ranges]]
-- [[API Reference/Report Request|`ReportRequest`]]
+- [Date Ranges](Server-Side-Reporting-Date-Ranges)
+- [`ReportRequest`](API-Reference-Report-Request)

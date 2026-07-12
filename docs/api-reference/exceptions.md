@@ -65,5 +65,5 @@ try {
 
 ## Related
 
-- [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]] — the exception-to-fix matrix.
-- [[HTTP Endpoints]] — how exceptions map to JSON error codes.
+- [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation) — the exception-to-fix matrix.
+- [HTTP Endpoints](HTTP-Endpoints) — how exceptions map to JSON error codes.

@@ -6,7 +6,7 @@ title: GA Overview
 
 The GA overview surface renders four headline metrics — **sessions**, **users**, **page views**, and **average engagement time** — plus a daily trend chart for a configurable date range.
 
-Every framework consumes the same [[HTTP Endpoints|`GET /analytics-google/overview`]] payload (Livewire renders it directly; React and Vue fetch it), so the numbers always match.
+Every framework consumes the same [`GET /analytics-google/overview`](HTTP-Endpoints) payload (Livewire renders it directly; React and Vue fetch it), so the numbers always match.
 
 ## Livewire
 
@@ -65,7 +65,7 @@ The component ships a built-in range picker with options `[7, 14, 30, 90]` — o
 
 ### Error handling
 
-Any non-2xx response throws `GaOverviewError` with a `code` and `message`. The component renders a code-specific branch when `code === 'base_not_installed'` and falls back to the raw message otherwise. See [[HTTP Endpoints]] for the error-code list.
+Any non-2xx response throws `GaOverviewError` with a `code` and `message`. The component renders a code-specific branch when `code === 'base_not_installed'` and falls back to the raw message otherwise. See [HTTP Endpoints](HTTP-Endpoints) for the error-code list.
 
 ## Vue
 
@@ -114,7 +114,7 @@ Both frameworks receive the same JSON shape from `GET /analytics-google/overview
 
 ## Related
 
-- [[Components/GA Top Content|GA Top Content]] — the sister surface.
-- [[HTTP Endpoints]] — the `/overview` endpoint reference.
-- [[API Reference/GA Overview Fetcher|`GaOverviewFetcher`]] — the fetch logic shared across surfaces.
-- [[API Reference/GA Overview Data|`GaOverviewData`]] — the payload DTO.
+- [GA Top Content](Components-GA-Top-Content) — the sister surface.
+- [HTTP Endpoints](HTTP-Endpoints) — the `/overview` endpoint reference.
+- [`GaOverviewFetcher`](API-Reference-GA-Overview-Fetcher) — the fetch logic shared across surfaces.
+- [`GaOverviewData`](API-Reference-GA-Overview-Data) — the payload DTO.

@@ -105,7 +105,7 @@ Non-numeric values are skipped. Missing metric name returns `0.0`.
 
 ## Related
 
-- [[Server-Side Reporting/GA4 Data Client|`Ga4DataClient`]]
-- [[Server-Side Reporting/Date Ranges|`DateRange`]]
-- [[API Reference/Report Request|API Reference — `ReportRequest`]]
-- [[API Reference/Report Response|API Reference — `ReportResponse`]]
+- [`Ga4DataClient`](Server-Side-Reporting-GA4-Data-Client)
+- [`DateRange`](Server-Side-Reporting-Date-Ranges)
+- [API Reference — `ReportRequest`](API-Reference-Report-Request)
+- [API Reference — `ReportResponse`](API-Reference-Report-Response)

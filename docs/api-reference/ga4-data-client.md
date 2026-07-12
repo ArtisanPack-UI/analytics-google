@@ -6,7 +6,7 @@ title: Ga4DataClient
 
 `ArtisanPackUI\AnalyticsGoogle\Reporting\Ga4DataClient` — the low-level GA4 Data API client. Executes `runReport` calls with an OAuth token from the base package's `TokenManager`, caches responses, and normalizes errors into typed exceptions.
 
-Full narrative usage: [[Server-Side Reporting/GA4 Data Client|GA4 Data Client]]. This page is the mechanical reference.
+Full narrative usage: [GA4 Data Client](Server-Side-Reporting-GA4-Data-Client). This page is the mechanical reference.
 
 ## Constructor
 
@@ -41,12 +41,12 @@ Executes a `runReport` request against `POST /properties/{propertyId}:runReport`
 
 **Throws** — in order of check:
 
-- [[API Reference/Exceptions|`BaseNotInstalledException`]] via `ensureBaseInstalled()` when `BaseInstalled::check()` is false.
-- [[API Reference/Exceptions|`ReportingException::missingConfiguration('analytics-google.reporting.property_id')`]] when no property is available.
-- [[API Reference/Exceptions|`BaseNotInstalledException::forReporting()`]] when `$tokens` is null (partial install).
-- [[API Reference/Exceptions|`ReportingException::authenticationFailed($e)`]] when `TokenManager::getValidAccessToken()` throws `TokenRefreshException`.
-- [[API Reference/Exceptions|`ReportingException::transportFailure($e)`]] on `ConnectionException` from the HTTP client.
-- [[API Reference/Exceptions|`ReportingException::apiError($status, $body)`]] on non-2xx HTTP status.
+- [`BaseNotInstalledException`](API-Reference-Exceptions) via `ensureBaseInstalled()` when `BaseInstalled::check()` is false.
+- [`ReportingException::missingConfiguration('analytics-google.reporting.property_id')`](API-Reference-Exceptions) when no property is available.
+- [`BaseNotInstalledException::forReporting()`](API-Reference-Exceptions) when `$tokens` is null (partial install).
+- [`ReportingException::authenticationFailed($e)`](API-Reference-Exceptions) when `TokenManager::getValidAccessToken()` throws `TokenRefreshException`.
+- [`ReportingException::transportFailure($e)`](API-Reference-Exceptions) on `ConnectionException` from the HTTP client.
+- [`ReportingException::apiError($status, $body)`](API-Reference-Exceptions) on non-2xx HTTP status.
 
 ### `isAvailable()`
 
@@ -70,11 +70,11 @@ Delegates to `BaseInstalled::check()`. Kept as a private helper so subclasses ca
 
 ## Cache semantics
 
-See [[Server-Side Reporting/Caching|Caching]].
+See [Caching](Server-Side-Reporting-Caching).
 
 ## Related
 
-- [[Server-Side Reporting/GA4 Data Client|Narrative usage guide]]
-- [[API Reference/Report Request|`ReportRequest`]]
-- [[API Reference/Report Response|`ReportResponse`]]
-- [[API Reference/Exceptions|Exceptions]]
+- [Narrative usage guide](Server-Side-Reporting-GA4-Data-Client)
+- [`ReportRequest`](API-Reference-Report-Request)
+- [`ReportResponse`](API-Reference-Report-Response)
+- [Exceptions](API-Reference-Exceptions)

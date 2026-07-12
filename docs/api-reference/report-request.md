@@ -6,7 +6,7 @@ title: ReportRequest
 
 `ArtisanPackUI\AnalyticsGoogle\Reporting\ReportRequest` — immutable, readonly `final` value object describing a single GA4 `runReport` query.
 
-Full narrative usage: [[Server-Side Reporting/Report Request|Report Request and Response]]. This page is the mechanical reference.
+Full narrative usage: [Report Request and Response](Server-Side-Reporting-Report-Request). This page is the mechanical reference.
 
 ## Constructor
 
@@ -55,6 +55,6 @@ Serialize to the shape the GA4 Data API's `runReport` endpoint expects. Empty `d
 
 ## Related
 
-- [[API Reference/Report Response|`ReportResponse`]]
-- [[API Reference/Date Range|`DateRange`]]
-- [[API Reference/GA4 Data Client|`Ga4DataClient`]]
+- [`ReportResponse`](API-Reference-Report-Response)
+- [`DateRange`](API-Reference-Date-Range)
+- [`Ga4DataClient`](API-Reference-GA4-Data-Client)

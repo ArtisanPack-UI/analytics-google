@@ -6,7 +6,7 @@ title: GA Top Content
 
 The top-content surface renders **top pages by page views** and **top events by count** for a configurable date range.
 
-Every framework consumes the same [[HTTP Endpoints|`GET /analytics-google/top-content`]] payload, so the numbers always match.
+Every framework consumes the same [`GET /analytics-google/top-content`](HTTP-Endpoints) payload, so the numbers always match.
 
 ## Livewire
 
@@ -41,7 +41,7 @@ Auto-registered as `analytics-google::ga-top-content` when Livewire is installed
 
 ### Error branches
 
-Same as [[Components/GA Overview|GA Overview]] — install prompt when base missing, error message otherwise.
+Same as [GA Overview](Components-GA-Overview) — install prompt when base missing, error message otherwise.
 
 ## React
 
@@ -99,7 +99,7 @@ Both frameworks receive the same JSON shape from `GET /analytics-google/top-cont
 
 ## Related
 
-- [[Components/GA Overview|GA Overview]] — the sister surface.
-- [[HTTP Endpoints]] — the `/top-content` endpoint reference.
-- [[API Reference/GA Top Content Fetcher|`GaTopContentFetcher`]] — the fetch logic shared across surfaces.
-- [[API Reference/GA Top Content Data|`GaTopContentData`]] — the payload DTO.
+- [GA Overview](Components-GA-Overview) — the sister surface.
+- [HTTP Endpoints](HTTP-Endpoints) — the `/top-content` endpoint reference.
+- [`GaTopContentFetcher`](API-Reference-GA-Top-Content-Fetcher) — the fetch logic shared across surfaces.
+- [`GaTopContentData`](API-Reference-GA-Top-Content-Data) — the payload DTO.

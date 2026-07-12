@@ -8,18 +8,18 @@ title: FAQ
 
 ### Do I need the base `artisanpack-ui/google` package?
 
-Only for **server-side reporting**. Client-side tracking (`@ga4Snippet`, React/Vue `<Ga4Snippet />`) works standalone. Install the base once you need dashboards or programmatic Data API queries. See [[Installation]] for the full install matrix.
+Only for **server-side reporting**. Client-side tracking (`@ga4Snippet`, React/Vue `<Ga4Snippet />`) works standalone. Install the base once you need dashboards or programmatic Data API queries. See [Installation](Installation) for the full install matrix.
 
 ### Do I need `artisanpack-ui/analytics`?
 
-No — this package works standalone or with just the base. Installing the analytics parent lets you route tracking through its consent gate and register `google-ga4` alongside other providers. See [[Analytics Parent Integration]].
+No — this package works standalone or with just the base. Installing the analytics parent lets you route tracking through its consent gate and register `google-ga4` alongside other providers. See [Analytics Parent Integration](Analytics-Parent-Integration).
 
 ### What's the difference between measurement ID and property ID?
 
 - **Measurement ID** (`G-XXXXXXX`) — for client-side tracking. Lives in `GA4_MEASUREMENT_ID` / `analytics-google.tracking.measurement_id`.
 - **Property ID** (numeric, e.g. `123456789`) — for server-side reporting. Lives in `GA4_PROPERTY_ID` / `analytics-google.reporting.property_id`.
 
-Mixing them up is the single most common config bug. See [[Installation/Google Cloud Setup|Google Cloud setup]] for how to find each.
+Mixing them up is the single most common config bug. See [Google Cloud setup](Installation-Google-Cloud-Setup) for how to find each.
 
 ## Tracking
 
@@ -29,7 +29,7 @@ Most likely causes, in order:
 
 1. `GA4_MEASUREMENT_ID` is empty → the directive emits nothing. Check `dd( app( \ArtisanPackUI\AnalyticsGoogle\Tracking\Gtag::class )->isConfigured() )`.
 2. `GA4_TRACKING_ENABLED=false` → tracking is master-off.
-3. `tracking.respect_consent` is `true` (default) and `window.__apAnalyticsConsent.analytics !== true` → the snippet loaded but Google is honoring the `analytics_storage: denied` default. See [[Client-Side Tracking/Consent Integration|Consent Integration]].
+3. `tracking.respect_consent` is `true` (default) and `window.__apAnalyticsConsent.analytics !== true` → the snippet loaded but Google is honoring the `analytics_storage: denied` default. See [Consent Integration](Client-Side-Tracking-Consent-Integration).
 4. An ad blocker is stripping the `gtag.js` script — check DevTools → Network for the `googletagmanager.com` request.
 
 ### Can I use this alongside another GA4 tracker?
@@ -38,7 +38,7 @@ Yes, but you'll double-count events. The safest path is to disable one — usual
 
 ### The snippet has `gtag('consent', 'default', {analytics_storage: 'denied'})` — is that a bug?
 
-No — that's the intentional consent guard. Set `analytics-google.tracking.respect_consent` to `false` to bypass it, or write `window.__apAnalyticsConsent = { analytics: true }` after user consent (the analytics parent does this for you). See [[Client-Side Tracking/Consent Integration|Consent Integration]].
+No — that's the intentional consent guard. Set `analytics-google.tracking.respect_consent` to `false` to bypass it, or write `window.__apAnalyticsConsent = { analytics: true }` after user consent (the analytics parent does this for you). See [Consent Integration](Client-Side-Tracking-Consent-Integration).
 
 ## Reporting
 
@@ -76,7 +76,7 @@ Not directly. Each `runReport` call is one property. Loop and dispatch them your
 composer require artisanpack-ui/google
 ```
 
-See [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]] for the full error-to-fix table.
+See [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation) for the full error-to-fix table.
 
 ## Components
 
@@ -110,6 +110,6 @@ Not out of the box — the default middleware is `[ 'web', 'auth' ]` and the con
 
 ## Related
 
-- [[Getting Started]]
-- [[Installation]]
-- [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]]
+- [Getting Started](Getting-Started)
+- [Installation](Installation)
+- [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation)

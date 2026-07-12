@@ -64,7 +64,7 @@ Or from the container directly:
 $snippet = app( \ArtisanPackUI\AnalyticsGoogle\Tracking\Gtag::class )->render();
 ```
 
-Full class reference: [[API Reference/Analytics Google|`AnalyticsGoogle`]] and the `Gtag` section of [[API Reference/Helpers]].
+Full class reference: [`AnalyticsGoogle`](API-Reference-Analytics-Google) and the `Gtag` section of [API Reference/Helpers](API-Reference-Helpers).
 
 ## Escaping and safety
 
@@ -74,7 +74,7 @@ That said, treat both values as trusted — anything you put in `analytics-googl
 
 ## Related
 
-- [[Client-Side Tracking/React|React]] — same snippet from a React component.
-- [[Client-Side Tracking/Vue|Vue]] — same snippet from a Vue component.
-- [[Client-Side Tracking/Consent Integration|Consent Integration]] — how `respect_consent` interacts with the analytics parent.
-- [[API Reference/Helpers|Helpers]] — the `ga4Snippet()` function.
+- [React](Client-Side-Tracking-React) — same snippet from a React component.
+- [Vue](Client-Side-Tracking-Vue) — same snippet from a Vue component.
+- [Consent Integration](Client-Side-Tracking-Consent-Integration) — how `respect_consent` interacts with the analytics parent.
+- [Helpers](API-Reference-Helpers) — the `ga4Snippet()` function.

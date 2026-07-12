@@ -23,11 +23,11 @@ Runs two `runReport` calls behind the scenes:
 1. **Totals** — metrics `sessions`, `totalUsers`, `screenPageViews`, `averageSessionDuration`. No dimensions.
 2. **Trend** — metrics `sessions`, `totalUsers`, `screenPageViews`. Dimension: `date`.
 
-Returns a [[API Reference/GA Overview Data|`GaOverviewData`]] with totals normalized to `{sessions, users, page_views, avg_engagement_seconds}` (all floats) and the trend sorted by date ascending with `YYYY-MM-DD` normalization from GA4's `YYYYMMDD` format.
+Returns a [`GaOverviewData`](API-Reference-GA-Overview-Data) with totals normalized to `{sessions, users, page_views, avg_engagement_seconds}` (all floats) and the trend sorted by date ascending with `YYYY-MM-DD` normalization from GA4's `YYYYMMDD` format.
 
 Impossible calendar dates (e.g. `20260230`) are preserved in the trend row unchanged rather than reshaped into invalid output.
 
-**Throws** — every exception `Ga4DataClient::runReport()` throws. See [[API Reference/GA4 Data Client|`Ga4DataClient`]].
+**Throws** — every exception `Ga4DataClient::runReport()` throws. See [`Ga4DataClient`](API-Reference-GA4-Data-Client).
 
 ## Metric constants (private)
 
@@ -55,5 +55,5 @@ $overview->trend;
 
 ## Related
 
-- [[API Reference/GA Overview Data|`GaOverviewData`]]
-- [[Components/GA Overview|GA Overview component]]
+- [`GaOverviewData`](API-Reference-GA-Overview-Data)
+- [GA Overview component](Components-GA-Overview)

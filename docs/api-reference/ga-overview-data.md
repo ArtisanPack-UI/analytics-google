@@ -36,6 +36,6 @@ JSON shape returned by the `/analytics-google/overview` endpoint:
 
 ## Related
 
-- [[API Reference/GA Overview Fetcher|`GaOverviewFetcher`]]
-- [[Components/GA Overview|GA Overview component]]
-- [[HTTP Endpoints]]
+- [`GaOverviewFetcher`](API-Reference-GA-Overview-Fetcher)
+- [GA Overview component](Components-GA-Overview)
+- [HTTP Endpoints](HTTP-Endpoints)

@@ -36,6 +36,6 @@ JSON shape returned by the `/analytics-google/top-content` endpoint:
 
 ## Related
 
-- [[API Reference/GA Top Content Fetcher|`GaTopContentFetcher`]]
-- [[Components/GA Top Content|GA Top Content component]]
-- [[HTTP Endpoints]]
+- [`GaTopContentFetcher`](API-Reference-GA-Top-Content-Fetcher)
+- [GA Top Content component](Components-GA-Top-Content)
+- [HTTP Endpoints](HTTP-Endpoints)

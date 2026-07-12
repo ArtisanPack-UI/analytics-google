@@ -48,7 +48,7 @@ Route name: `analytics-google.overview`. Handled by `GaOverviewController::__inv
 }
 ```
 
-The shape is `GaOverviewData::toArray()` — see [[API Reference/GA Overview Data|`GaOverviewData`]].
+The shape is `GaOverviewData::toArray()` — see [`GaOverviewData`](API-Reference-GA-Overview-Data).
 
 ## `GET /analytics-google/top-content`
 
@@ -76,7 +76,7 @@ Route name: `analytics-google.top-content`. Handled by `GaTopContentController::
 }
 ```
 
-The shape is `GaTopContentData::toArray()` — see [[API Reference/GA Top Content Data|`GaTopContentData`]].
+The shape is `GaTopContentData::toArray()` — see [`GaTopContentData`](API-Reference-GA-Top-Content-Data).
 
 ## Error responses
 
@@ -122,6 +122,6 @@ try {
 
 ## Related
 
-- [[Components]] — the surfaces that consume these endpoints.
-- [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]] — the exception matrix that maps to each error code.
-- [[Configuration]] — the full `routes.*` reference.
+- [Components](Components) — the surfaces that consume these endpoints.
+- [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation) — the exception matrix that maps to each error code.
+- [Configuration](Configuration) — the full `routes.*` reference.

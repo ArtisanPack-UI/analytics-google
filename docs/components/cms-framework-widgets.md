@@ -71,6 +71,6 @@ You should not use those names directly — they exist only so the CMS's `AdminW
 
 ## Related
 
-- [[Components/GA Overview|GA Overview]]
-- [[Components/GA Top Content|GA Top Content]]
+- [GA Overview](Components-GA-Overview)
+- [GA Top Content](Components-GA-Top-Content)
 - The [`artisanpack-ui/cms-framework`](https://github.com/ArtisanPack-UI/cms-framework) admin widgets documentation covers how end users add widgets to their dashboards.

@@ -102,6 +102,6 @@ Both the Livewire components and the HTTP controllers resolve through this class
 
 ## Related
 
-- [[API Reference/GA4 Data Client|`Ga4DataClient`]]
-- [[API Reference/GA4 Provider|`Ga4Provider`]]
-- [[API Reference/Helpers|Helpers and the `Gtag` service]]
+- [`Ga4DataClient`](API-Reference-GA4-Data-Client)
+- [`Ga4Provider`](API-Reference-GA4-Provider)
+- [Helpers and the `Gtag` service](API-Reference-Helpers)

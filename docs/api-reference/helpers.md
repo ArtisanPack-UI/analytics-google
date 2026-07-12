@@ -79,5 +79,5 @@ if ( $gtag->isConfigured() ) {
 
 ## Related
 
-- [[Client-Side Tracking/Blade|`@ga4Snippet` directive]]
-- [[API Reference/Analytics Google|`AnalyticsGoogle`]]
+- [`@ga4Snippet` directive](Client-Side-Tracking-Blade)
+- [`AnalyticsGoogle`](API-Reference-Analytics-Google)

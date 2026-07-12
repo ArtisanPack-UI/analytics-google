@@ -4,7 +4,7 @@ title: Configuration
 
 # Configuration
 
-This page collects every configurable knob in `config/analytics-google.php` organized by the task you're trying to accomplish. For a straight top-to-bottom mirror of the published config file, see [[Installation/Configuration|Configuration reference]]. For env-var-specific detail, see [[Installation/Environment Variables|Environment variables]].
+This page collects every configurable knob in `config/analytics-google.php` organized by the task you're trying to accomplish. For a straight top-to-bottom mirror of the published config file, see [Configuration reference](Installation-Configuration). For env-var-specific detail, see [Environment variables](Installation-Environment-Variables).
 
 ## Publishing
 
@@ -35,7 +35,7 @@ Set `GA4_PROPERTY_ID`. Or set `analytics-google.reporting.property_id` directly.
 ],
 ```
 
-See [[Client-Side Tracking/Consent Integration|Consent Integration]] for the full picture.
+See [Consent Integration](Client-Side-Tracking-Consent-Integration) for the full picture.
 
 ### I want to customize the `gtag('config', …)` options
 
@@ -58,7 +58,7 @@ Keep values to primitives — the emitted `<script>` uses JSON-escape flags to p
 ],
 ```
 
-Set to `0` to disable. See [[Server-Side Reporting/Caching|Caching]] for the key shape and store-selection details.
+Set to `0` to disable. See [Caching](Server-Side-Reporting-Caching) for the key shape and store-selection details.
 
 ### I want to change the request timeout for the Data API
 
@@ -68,7 +68,7 @@ Set to `0` to disable. See [[Server-Side Reporting/Caching|Caching]] for the key
 ],
 ```
 
-Trips [[API Reference/Exceptions|`ReportingException::transportFailure()`]] on timeout.
+Trips [`ReportingException::transportFailure()`](API-Reference-Exceptions) on timeout.
 
 ### I want to disable the HTTP endpoints (headless / API app)
 
@@ -106,7 +106,7 @@ Anything in the Laravel middleware pipeline works. The default `[ 'web', 'auth' 
 'provider_name' => 'google-analytics',
 ```
 
-Then add `google-analytics` to `artisanpack.analytics.active_providers` on the parent. See [[Analytics Parent Integration]].
+Then add `google-analytics` to `artisanpack.analytics.active_providers` on the parent. See [Analytics Parent Integration](Analytics-Parent-Integration).
 
 ### I want to change the OAuth scopes contributed to the base
 
@@ -117,10 +117,10 @@ Then add `google-analytics` to `artisanpack.analytics.active_providers` on the p
 ],
 ```
 
-Contributed to the base's `ScopeRegistry` via `ap.google.scopes`. Also add the new scope to the OAuth consent screen — see [[Installation/Google Cloud Setup|Google Cloud setup]].
+Contributed to the base's `ScopeRegistry` via `ap.google.scopes`. Also add the new scope to the OAuth consent screen — see [Google Cloud setup](Installation-Google-Cloud-Setup).
 
 ## Related
 
-- [[Installation/Configuration|Configuration reference]] — top-to-bottom mirror of the config file.
-- [[Installation/Environment Variables|Environment variables]] — every env var.
-- [[HTTP Endpoints]] — full route details.
+- [Configuration reference](Installation-Configuration) — top-to-bottom mirror of the config file.
+- [Environment variables](Installation-Environment-Variables) — every env var.
+- [HTTP Endpoints](HTTP-Endpoints) — full route details.

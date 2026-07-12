@@ -20,11 +20,11 @@ title: Requirements
 
 | Package | Version | What it enables |
 |---|---|---|
-| [`artisanpack-ui/google`](https://github.com/ArtisanPack-UI/google) | `^1.0` | Server-side reporting. Provides the OAuth token manager and `GoogleConnection` model that `Ga4DataClient` reads from. **Without it, tracking still works but reporting throws [[API Reference/Exceptions|`BaseNotInstalledException`]].** |
-| [`artisanpack-ui/hooks`](https://github.com/ArtisanPack-UI/hooks) | `^1.2` | Required only if you want the package to contribute the `analytics.readonly` scope to the base's [[Server-Side Reporting|`ap.google.scopes`]] filter hook. Pulled in transitively by the base — you rarely install it explicitly. |
-| [`artisanpack-ui/analytics`](https://github.com/ArtisanPack-UI/analytics) | any | Registers this package as the `google-ga4` provider so tracking runs behind the parent's consent gate. See [[Analytics Parent Integration]]. |
+| [`artisanpack-ui/google`](https://github.com/ArtisanPack-UI/google) | `^1.0` | Server-side reporting. Provides the OAuth token manager and `GoogleConnection` model that `Ga4DataClient` reads from. **Without it, tracking still works but reporting throws [`BaseNotInstalledException`](API-Reference-Exceptions).** |
+| [`artisanpack-ui/hooks`](https://github.com/ArtisanPack-UI/hooks) | `^1.2` | Required only if you want the package to contribute the `analytics.readonly` scope to the base's [`ap.google.scopes`](Server-Side-Reporting) filter hook. Pulled in transitively by the base — you rarely install it explicitly. |
+| [`artisanpack-ui/analytics`](https://github.com/ArtisanPack-UI/analytics) | any | Registers this package as the `google-ga4` provider so tracking runs behind the parent's consent gate. See [Analytics Parent Integration](Analytics-Parent-Integration). |
 | [`livewire/livewire`](https://livewire.laravel.com/) | `^3.6` | The `<livewire:analytics-google::ga-overview />` and `<livewire:analytics-google::ga-top-content />` components. |
-| [`artisanpack-ui/cms-framework`](https://github.com/ArtisanPack-UI/cms-framework) | any | Registers the two reporting components as admin dashboard widgets. See [[Components/CMS Framework Widgets|CMS framework widgets]]. |
+| [`artisanpack-ui/cms-framework`](https://github.com/ArtisanPack-UI/cms-framework) | any | Registers the two reporting components as admin dashboard widgets. See [CMS framework widgets](Components-CMS-Framework-Widgets). |
 | [`guzzlehttp/guzzle`](https://github.com/guzzle/guzzle) | `^7.5` | Backs Laravel's HTTP client, used by `Ga4DataClient` to call the GA4 Data API. Laravel apps almost always have Guzzle installed already. |
 
 None of these are strictly required. Each one unlocks a capability; missing peers are detected and skipped silently.
@@ -41,7 +41,7 @@ For **server-side reporting** you need, in addition:
 - The **Google Analytics Data API** enabled on the Google Cloud project backing your OAuth client.
 - An OAuth-connected Google account with at least **Viewer** access on the GA4 property, granted the `https://www.googleapis.com/auth/analytics.readonly` scope during consent.
 
-Full walkthrough: [[Installation/Google Cloud Setup|Google Cloud setup]].
+Full walkthrough: [Google Cloud setup](Installation-Google-Cloud-Setup).
 
 ## Database
 

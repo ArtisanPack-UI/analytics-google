@@ -50,7 +50,7 @@ With the guard off, the emitted snippet skips the `gtag('consent', 'default', �
 
 ## Provider registration and the parent's consent gate
 
-Independent of the guard above, the package registers itself as the `google-ga4` provider with the analytics parent via `Analytics::extend()`. This is what causes the parent to include the tracker in its `@analyticsScripts` output only after consent. See [[Analytics Parent Integration]] for how the two mechanisms compose.
+Independent of the guard above, the package registers itself as the `google-ga4` provider with the analytics parent via `Analytics::extend()`. This is what causes the parent to include the tracker in its `@analyticsScripts` output only after consent. See [Analytics Parent Integration](Analytics-Parent-Integration) for how the two mechanisms compose.
 
 ## Debugging
 
@@ -60,5 +60,5 @@ Independent of the guard above, the package registers itself as the `google-ga4`
 
 ## Related
 
-- [[Analytics Parent Integration]] — how the `google-ga4` provider registration works.
-- [[Client-Side Tracking/Blade|Blade]], [[Client-Side Tracking/React|React]], [[Client-Side Tracking/Vue|Vue]] — the three renderers all obey the same guard.
+- [Analytics Parent Integration](Analytics-Parent-Integration) — how the `google-ga4` provider registration works.
+- [Blade](Client-Side-Tracking-Blade), [React](Client-Side-Tracking-React), [Vue](Client-Side-Tracking-Vue) — the three renderers all obey the same guard.

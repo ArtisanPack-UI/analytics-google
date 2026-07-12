@@ -6,7 +6,7 @@ title: Google Cloud Setup
 
 Server-side reporting queries the **GA4 Data API** on a Google Cloud project. This page walks through the GA4-specific setup that sits on top of the base [`artisanpack-ui/google`](https://github.com/ArtisanPack-UI/google) package's Cloud Console walkthrough — the base package owns the OAuth client, this package adds an API and a scope.
 
-If you haven't already, follow the base package's [[Installation/Google Cloud Setup|Google Cloud setup]] first to create the OAuth client. Everything below assumes that's done.
+If you haven't already, follow the base package's [Google Cloud setup](Installation-Google-Cloud-Setup) first to create the OAuth client. Everything below assumes that's done.
 
 ## 1. Enable the Google Analytics Data API
 
@@ -42,7 +42,7 @@ Save this as `GA4_PROPERTY_ID` in `.env`:
 GA4_PROPERTY_ID=123456789
 ```
 
-Not the measurement ID (`G-XXXXXXX`) — that one is for [[Client-Side Tracking|client-side tracking]] only. GA4 uses two distinct IDs on purpose, and mixing them up is the single most common config bug.
+Not the measurement ID (`G-XXXXXXX`) — that one is for [client-side tracking](Client-Side-Tracking) only. GA4 uses two distinct IDs on purpose, and mixing them up is the single most common config bug.
 
 ## 4. Find your GA4 measurement ID (tracking only)
 
@@ -68,7 +68,7 @@ In GA4 → **Admin → Property → Property access management**:
 - Add the Google account email.
 - Assign the **Viewer** role.
 
-Users without property access will hit an HTTP 403 from the Data API when the app runs its first report — which the package surfaces as [[API Reference/Exceptions|`ReportingException::apiError()`]] with a `PERMISSION_DENIED` message body.
+Users without property access will hit an HTTP 403 from the Data API when the app runs its first report — which the package surfaces as [`ReportingException::apiError()`](API-Reference-Exceptions) with a `PERMISSION_DENIED` message body.
 
 ## 6. Verify the connection
 
@@ -91,11 +91,11 @@ $response = $client->runReport(
 dd( $response->totalFor( 'sessions' ) );
 ```
 
-A number (even `0`) means the whole pipeline works. An exception surfaces which step failed — see [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]] for the map from exception to fix.
+A number (even `0`) means the whole pipeline works. An exception surfaces which step failed — see [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation) for the map from exception to fix.
 
 ## Troubleshooting
 
-- **`redirect_uri_mismatch`** on the connect step — a base package OAuth client issue; see the base's [[Installation/Google Cloud Setup|Google Cloud setup]].
+- **`redirect_uri_mismatch`** on the connect step — a base package OAuth client issue; see the base's [Google Cloud setup](Installation-Google-Cloud-Setup).
 - **`invalid_scope`** — you didn't add `analytics.readonly` in step 2.
 - **HTTP 403 with `PERMISSION_DENIED`** — the connected user doesn't have GA4 property access (step 5) or the Data API isn't enabled (step 1).
 - **HTTP 404 with `Property … does not exist`** — the property ID is wrong. Double-check the numeric ID from step 3.

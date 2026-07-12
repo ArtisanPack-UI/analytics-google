@@ -144,6 +144,6 @@ getJson( '/analytics-google/overview' )
 
 ## Related
 
-- [[HTTP Endpoints]]
-- [[Server-Side Reporting/GA4 Data Client|`Ga4DataClient`]]
-- [[Server-Side Reporting/Graceful Degradation|Graceful Degradation]]
+- [HTTP Endpoints](HTTP-Endpoints)
+- [`Ga4DataClient`](Server-Side-Reporting-GA4-Data-Client)
+- [Graceful Degradation](Server-Side-Reporting-Graceful-Degradation)

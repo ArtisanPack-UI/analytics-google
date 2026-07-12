@@ -4,7 +4,7 @@ title: Ga4Provider
 
 # `Ga4Provider` and `Ga4AnalyticsProviderAdapter`
 
-Two classes handle registration with the [`artisanpack-ui/analytics`](https://github.com/ArtisanPack-UI/analytics) parent. Full narrative details: [[Analytics Parent Integration]].
+Two classes handle registration with the [`artisanpack-ui/analytics`](https://github.com/ArtisanPack-UI/analytics) parent. Full narrative details: [Analytics Parent Integration](Analytics-Parent-Integration).
 
 ## `Ga4Provider`
 
@@ -54,5 +54,5 @@ For server-emitted GA4 events (Measurement Protocol), use the provider that ship
 
 ## Related
 
-- [[Analytics Parent Integration]]
-- [[Client-Side Tracking/Consent Integration|Consent Integration]]
+- [Analytics Parent Integration](Analytics-Parent-Integration)
+- [Consent Integration](Client-Side-Tracking-Consent-Integration)

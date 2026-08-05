@@ -25,6 +25,7 @@ use ArtisanPackUI\AnalyticsGoogle\Reporting\Ga4DataClient;
 use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
 use ArtisanPackUI\AnalyticsGoogle\Support\GoogleConnectionResolver;
 use ArtisanPackUI\AnalyticsGoogle\Tracking\Gtag;
+use ArtisanPackUI\AnalyticsGoogle\Tracking\MeasurementProtocol;
 use ArtisanPackUI\Google\Tokens\TokenManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -47,6 +48,11 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
         $this->mergeConfigFrom( __DIR__ . '/../config/analytics-google.php', 'analytics-google' );
 
         $this->app->singleton( Gtag::class, fn ( Application $app ): Gtag => new Gtag( $app[ 'config' ] ) );
+
+        $this->app->singleton( MeasurementProtocol::class, fn ( Application $app ): MeasurementProtocol => new MeasurementProtocol(
+            $app[ 'config' ],
+            $app->make( HttpFactory::class ),
+        ) );
 
         $this->app->singleton( GoogleConnectionResolver::class, fn (): GoogleConnectionResolver => new GoogleConnectionResolver() );
 
@@ -230,7 +236,11 @@ class AnalyticsGoogleServiceProvider extends ServiceProvider
             $analytics->extend( $providerName, static function ( $app ) use ( $providerName ) {
                 $ga4 = $app->make( Ga4Provider::class );
 
-                return new Providers\Ga4AnalyticsProviderAdapter( $ga4, $providerName );
+                return new Providers\Ga4AnalyticsProviderAdapter(
+                    $ga4,
+                    $providerName,
+                    $app->make( MeasurementProtocol::class ),
+                );
             } );
         } );
     }

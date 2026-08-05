@@ -48,6 +48,50 @@ return [
         // immediately since there is no consent gate to defer to.
         'respect_consent' => true,
 
+        /*
+        |----------------------------------------------------------------------
+        | Server-side forwarding (Measurement Protocol)
+        |----------------------------------------------------------------------
+        |
+        | When the analytics parent is installed and `google-ga4` is listed in
+        | its `active_providers`, page views and events it collects are
+        | relayed to GA4 over the Measurement Protocol.
+        |
+        | This needs an API secret in addition to the measurement ID above.
+        | Create one in GA4: Admin -> Data Streams -> (your stream) ->
+        | Measurement Protocol API secrets. Forwarding stays off until both
+        | are present.
+        |
+        | Worth knowing before you rely on it: Measurement Protocol hits do
+        | not carry the automatic attribution a gtag.js tag provides. Referrer,
+        | geography, device and session stitching are weaker or absent unless
+        | explicitly supplied, so reports built on forwarded data will not look
+        | identical to reports from a client-side tag.
+        |
+        */
+
+        // The GA4 Measurement Protocol API secret.
+        'api_secret' => env( 'GA4_API_SECRET' ),
+
+        // Whether to relay the parent's page views and events to GA4.
+        // Requires both a measurement ID and an API secret.
+        'server_side' => env( 'GA4_SERVER_SIDE_TRACKING', true ),
+
+        // Absolute base used to build `page_location`, which GA4 expects to
+        // be a full URL rather than a path. Defaults to the app URL.
+        'page_location_base' => env( 'GA4_PAGE_LOCATION_BASE' ),
+
+        // Request timeout in seconds for Measurement Protocol calls. Kept
+        // short: this runs on the ingest request path, and GA4 being slow
+        // must not become the host application being slow.
+        'timeout' => 3,
+
+        // Send to GA4's validation endpoint instead of the live one. The
+        // validation endpoint reports payload problems that the live endpoint
+        // silently accepts, so it is the only way to debug a payload that
+        // "sends fine" and never appears in reports.
+        'debug' => env( 'GA4_MEASUREMENT_PROTOCOL_DEBUG', false ),
+
     ],
 
     /*

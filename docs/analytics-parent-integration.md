@@ -29,10 +29,19 @@ $this->app->booted( function (): void {
     $analytics->extend( $providerName, static function ( $app ) use ( $providerName ) {
         $ga4 = $app->make( Ga4Provider::class );
 
-        return new Providers\Ga4AnalyticsProviderAdapter( $ga4, $providerName );
+        return new Providers\Ga4AnalyticsProviderAdapter(
+            $ga4,
+            $providerName,
+            $app->make( MeasurementProtocol::class ),
+        );
     } );
 } );
 ```
+
+The third argument is what makes `trackPageView()` and `trackEvent()` forward. It
+defaults to `null` so existing instantiations keep working, but an adapter built
+without it silently does not forward — if you are registering the adapter
+yourself rather than relying on this package's service provider, pass it.
 
 ## Enabling the provider
 
@@ -89,6 +98,16 @@ Two things worth knowing before relying on forwarding:
   visitor group into a single GA4 user. Where the parent has no visitor ID —
   anonymous mode, for instance — a per-hit random ID is generated instead, and
   GA4 will read those hits as separate users.
+- **Sessions are GA4's, not the parent's.** GA4 requires `session_id` to match
+  `^\d+$`, and the parent's session identifiers are UUIDs. A UUID is dropped
+  rather than sent, because GA4 rejects or mis-attributes an invalid one
+  instead of erroring, and GA4 derives its own session instead. Forwarded hits
+  therefore will not share session boundaries with the parent's dashboard.
+- Event and parameter names are coerced to GA4's rules: letters, digits and
+  underscores, starting with a letter, 40 characters. Names starting with a
+  digit or underscore, or with the reserved `ga_` / `google_` / `firebase_`
+  prefixes, are prefixed with `e_` — GA4 discards non-conforming events
+  silently, so a rejected name looks exactly like a working one.
 
 To debug a payload that sends successfully but never appears in reports, set
 `GA4_MEASUREMENT_PROTOCOL_DEBUG=true` to target GA4's validation endpoint,

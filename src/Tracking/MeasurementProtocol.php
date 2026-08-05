@@ -65,6 +65,22 @@ class MeasurementProtocol
 	 */
 	protected const MAX_EVENT_NAME_LENGTH = 40;
 
+	/**
+	 * GA4's parameter name length ceiling.
+	 *
+	 * @var int
+	 */
+	protected const MAX_PARAM_NAME_LENGTH = 40;
+
+	/**
+	 * Prefix applied to names GA4 would reject for starting with something
+	 * other than a letter, or for using a reserved prefix. Deliberately not
+	 * `ga_`, `google_` or `firebase_`, all of which are themselves reserved.
+	 *
+	 * @var string
+	 */
+	protected const NAME_PREFIX = 'e_';
+
 	public function __construct(
 		protected ConfigRepository $config,
 		protected HttpFactory $http,
@@ -194,8 +210,10 @@ class MeasurementProtocol
 			],
 		];
 
-		if ( ! empty( $data['session_id'] ) ) {
-			$payload['events'][0]['params']['session_id'] = (string) $data['session_id'];
+		$sessionId = $this->sessionId( $data['session_id'] ?? null );
+
+		if ( null !== $sessionId ) {
+			$payload['events'][0]['params']['session_id'] = $sessionId;
 		}
 
 		$url = sprintf(
@@ -212,12 +230,27 @@ class MeasurementProtocol
 				->post( $url, $payload );
 
 			// The live endpoint returns 204 for anything it accepts, including
-			// payloads it then discards, so a non-2xx is the only signal worth
-			// reporting. The validation endpoint is where real feedback lives.
+			// payloads it then discards, so a non-2xx is the only transport-level
+			// signal worth reporting.
 			if ( $response->failed() ) {
 				Log::warning( 'GA4 Measurement Protocol request failed', [
 					'status' => $response->status(),
 					'event'  => $name,
+				] );
+
+				return;
+			}
+
+			// The validation endpoint answers 200 with a validationMessages
+			// array describing what it would have rejected. Reading only the
+			// status code there would make debug mode report nothing, which is
+			// the opposite of what it is for.
+			$validationMessages = $response->json( 'validationMessages' );
+
+			if ( is_array( $validationMessages ) && [] !== $validationMessages ) {
+				Log::warning( 'GA4 Measurement Protocol rejected the payload', [
+					'event'    => $name,
+					'messages' => $validationMessages,
 				] );
 			}
 		} catch ( Throwable $e ) {
@@ -233,19 +266,60 @@ class MeasurementProtocol
 	 * Resolve the GA4 client ID.
 	 *
 	 * Reuses the parent's visitor ID so every hit from one visitor groups into
-	 * a single GA4 user. Without it GA4 would read each hit as a new user and
-	 * the property's user counts would be meaningless, so the fallback is a
-	 * per-hit random ID and that consequence is accepted knowingly.
+	 * a single GA4 user. GA4 documents `client_id` as a string with no format
+	 * requirement, so an opaque value such as a UUID is passed through
+	 * unchanged: stability across a visitor's hits is what makes user counts
+	 * meaningful, and rewriting a stable ID into GA's conventional
+	 * `<random>.<timestamp>` shape would either break that stability or be a
+	 * pointless deterministic re-encoding.
+	 *
+	 * The one thing the conventional format buys — joining server-side hits to
+	 * a gtag.js `_ga` cookie — is not available to us anyway: that value is not
+	 * knowable here, and running both surfaces against the same events
+	 * double-counts regardless.
+	 *
+	 * Without a visitor ID the fallback is a per-hit random ID, which GA4 reads
+	 * as a separate user each time. That consequence is accepted knowingly and
+	 * documented.
 	 *
 	 * @since 1.1.0
 	 */
 	protected function clientId( ?string $visitorId ): string
 	{
-		if ( is_string( $visitorId ) && '' !== $visitorId ) {
-			return $visitorId;
+		if ( is_string( $visitorId ) && '' !== trim( $visitorId ) ) {
+			return trim( $visitorId );
 		}
 
 		return sprintf( '%d.%d', random_int( 100000000, 999999999 ), time() );
+	}
+
+	/**
+	 * Resolve a GA4-acceptable session ID, or null to omit it.
+	 *
+	 * Unlike `client_id`, GA4 is strict here: `session_id` must match `^\d+$`.
+	 * The parent's session identifiers are UUIDs, which do not, and sending
+	 * one produces a rejected or mis-attributed hit rather than an error.
+	 *
+	 * Omitting it lets GA4 derive its own session. That loses the parent's
+	 * session grouping, but a session GA4 builds itself is more useful than
+	 * one it refuses, and the alternative fails invisibly.
+	 *
+	 * @since 1.1.0
+	 */
+	protected function sessionId( mixed $sessionId ): ?string
+	{
+		if ( ! is_string( $sessionId ) && ! is_int( $sessionId ) ) {
+			return null;
+		}
+
+		$sessionId = trim( (string) $sessionId );
+
+		// Digits only, and non-zero. `ctype_digit` alone would accept "0".
+		if ( 1 !== preg_match( '/^\d+$/', $sessionId ) || '0' === ltrim( $sessionId, '0' ) || '' === ltrim( $sessionId, '0' ) ) {
+			return null;
+		}
+
+		return $sessionId;
 	}
 
 	/**
@@ -277,34 +351,59 @@ class MeasurementProtocol
 	/**
 	 * Normalize an event name to GA4's rules.
 	 *
-	 * Alphanumerics and underscores, 40 characters, and it may not start with
-	 * a digit. GA4 rejects the whole event otherwise, and does so silently.
-	 *
 	 * @since 1.1.0
 	 */
 	protected function normalizeEventName( string $name ): string
 	{
-		$normalized = $this->normalizeParamName( $name );
-
-		if ( '' === $normalized ) {
-			return '';
-		}
-
-		if ( 1 === preg_match( '/^[0-9]/', $normalized ) ) {
-			$normalized = '_' . $normalized;
-		}
-
-		return substr( $normalized, 0, self::MAX_EVENT_NAME_LENGTH );
+		return $this->normalizeName( $name, self::MAX_EVENT_NAME_LENGTH );
 	}
 
 	/**
-	 * Normalize a parameter name to GA4's character rules.
+	 * Normalize a parameter name to GA4's rules.
 	 *
 	 * @since 1.1.0
 	 */
 	protected function normalizeParamName( string $name ): string
 	{
-		return (string) preg_replace( '/[^a-zA-Z0-9_]/', '_', $name );
+		return $this->normalizeName( $name, self::MAX_PARAM_NAME_LENGTH );
+	}
+
+	/**
+	 * Coerce a name into something GA4 will accept.
+	 *
+	 * GA4's rules for both event and parameter names: alphanumerics and
+	 * underscores only, and it must **start with a letter**. Names starting
+	 * with an underscore, or with `ga_` / `google_` / `firebase_`, are
+	 * reserved and rejected.
+	 *
+	 * The letter requirement is why a leading digit cannot simply be prefixed
+	 * with an underscore — that swaps one rejected name for another. An
+	 * alphabetic prefix is used instead, and the length cap is applied after
+	 * prefixing so the result cannot exceed the limit.
+	 *
+	 * GA4 discards non-conforming events silently, so getting this wrong looks
+	 * exactly like getting it right until the reports stay empty.
+	 *
+	 * @param string $name      The name to normalize.
+	 * @param int    $maxLength The GA4 length ceiling for this kind of name.
+	 *
+	 * @since 1.1.0
+	 */
+	protected function normalizeName( string $name, int $maxLength ): string
+	{
+		$normalized = (string) preg_replace( '/[^a-zA-Z0-9_]/', '_', $name );
+
+		if ( '' === $normalized ) {
+			return '';
+		}
+
+		// Must start with a letter, and must not use a reserved prefix.
+		if ( 1 !== preg_match( '/^[a-zA-Z]/', $normalized )
+			|| 1 === preg_match( '/^(ga|google|firebase)_/i', $normalized ) ) {
+			$normalized = self::NAME_PREFIX . $normalized;
+		}
+
+		return substr( $normalized, 0, $maxLength );
 	}
 
 	/**

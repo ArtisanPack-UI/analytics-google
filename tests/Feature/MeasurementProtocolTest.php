@@ -9,6 +9,7 @@ use ArtisanPackUI\AnalyticsGoogle\Providers\Ga4Provider;
 use ArtisanPackUI\AnalyticsGoogle\Tracking\MeasurementProtocol;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 beforeEach( function (): void {
 	config()->set( 'app.url', 'https://docs.example.test' );
@@ -18,8 +19,33 @@ beforeEach( function (): void {
 	config()->set( 'analytics-google.tracking.debug', false );
 
 	Http::preventStrayRequests();
-	Http::fake( [ 'www.google-analytics.com/*' => Http::response( '', 204 ) ] );
+
+	// One stub, registered once, resolving its response at call time.
+	//
+	// Http::fake() appends stubs and the first match wins, so a second
+	// fake() for the same URL in a test is silently ignored — which made the
+	// transport-failure tests here pass without ever exercising a failure.
+	// Tests change the response through ga4Respond() instead.
+	test()->ga4Response = Http::response( '', 204 );
+
+	Http::fake( [
+		'www.google-analytics.com/*' => function ( Request $request ) {
+			$response = test()->ga4Response;
+
+			return is_callable( $response ) ? $response( $request ) : $response;
+		},
+	] );
 } );
+
+/**
+ * Set the response the faked GA4 endpoint will return.
+ *
+ * Accepts a closure so a test can throw from the transport.
+ */
+function ga4Respond( mixed $response ): void
+{
+	test()->ga4Response = $response;
+}
 
 /**
  * Resolve the Measurement Protocol client from the container.
@@ -80,7 +106,9 @@ test( 'a page view is forwarded as a GA4 page_view event', function (): void {
 		->and( $payload['events'][0]['name'] )->toBe( 'page_view' )
 		->and( $payload['events'][0]['params']['page_title'] )->toBe( 'Getting Started' )
 		->and( $payload['events'][0]['params']['page_referrer'] )->toBe( 'https://duckduckgo.com/' )
-		->and( $payload['events'][0]['params']['session_id'] )->toBe( 'session-xyz' );
+		// 'session-xyz' is not GA4-valid, so it is deliberately omitted —
+		// covered directly by the session id tests below.
+		->and( $payload['events'][0]['params'] )->not->toHaveKey( 'session_id' );
 } );
 
 test( 'page_location is sent as an absolute URL, not a bare path', function (): void {
@@ -135,17 +163,138 @@ test( 'a missing visitor id falls back to a generated client id', function (): v
 	expect( sentPayload()['client_id'] )->toMatch( '/^\d{9}\.\d+$/' );
 } );
 
+test( 'an opaque visitor id is passed through unchanged as the client id', function (): void {
+	// GA4 documents client_id as a string with no format requirement. What
+	// matters is that one visitor keeps one value, so a UUID is passed through
+	// rather than re-encoded into GA's conventional shape.
+	measurementProtocol()->event( 'docs_code_copy', [
+		'visitor_id' => '9f8c1c7e-2b1a-4c3d-8e5f-6a7b8c9d0e1f',
+	] );
+
+	expect( sentPayload()['client_id'] )->toBe( '9f8c1c7e-2b1a-4c3d-8e5f-6a7b8c9d0e1f' );
+} );
+
+test( 'a non-numeric session id is omitted rather than sent', function (): void {
+	// GA4 requires session_id to match ^\d+$. The parent's session IDs are
+	// UUIDs, and sending one produces a rejected or mis-attributed hit rather
+	// than an error, so it is dropped and GA4 derives its own session.
+	measurementProtocol()->pageView( [
+		'path'       => '/docs/one',
+		'session_id' => '11111111-2222-4333-8444-555555555555',
+	] );
+
+	expect( sentPayload()['events'][0]['params'] )->not->toHaveKey( 'session_id' );
+} );
+
+test( 'a numeric session id is forwarded', function (): void {
+	measurementProtocol()->pageView( [ 'path' => '/docs/one', 'session_id' => '1724130000' ] );
+
+	expect( sentPayload()['events'][0]['params']['session_id'] )->toBe( '1724130000' );
+} );
+
+test( 'a zero or partially numeric session id is rejected', function ( mixed $sessionId ): void {
+	measurementProtocol()->pageView( [ 'path' => '/docs/one', 'session_id' => $sessionId ] );
+
+	expect( sentPayload()['events'][0]['params'] )->not->toHaveKey( 'session_id' );
+} )->with( [
+	'zero'             => [ '0' ],
+	'padded zero'      => [ '000' ],
+	'digits then text' => [ '12345abc' ],
+	'negative'         => [ '-1' ],
+	'empty'            => [ '' ],
+	'array'            => [ [ 'nope' ] ],
+] );
+
+test( 'validation messages from the debug endpoint are logged', function (): void {
+	// The debug endpoint answers 200 with a validationMessages array. Reading
+	// only the status code there would make debug mode report nothing, which
+	// is the opposite of what it is for.
+	config()->set( 'analytics-google.tracking.debug', true );
+
+	ga4Respond( Http::response( [
+		'validationMessages' => [
+			[
+				'fieldPath'      => 'events[0].name',
+				'description'    => 'Event at index 0 has invalid name.',
+				'validationCode' => 'NAME_INVALID',
+			],
+		],
+	], 200 ) );
+
+	Log::shouldReceive( 'warning' )
+		->once()
+		->withArgs( function ( string $message, array $context ): bool {
+			return str_contains( $message, 'rejected the payload' )
+				&& 'NAME_INVALID' === $context['messages'][0]['validationCode'];
+		} );
+
+	measurementProtocol()->pageView( [ 'path' => '/docs/one' ] );
+
+	expect( true )->toBeTrue();
+} );
+
+test( 'an empty validation message list is not logged', function (): void {
+	config()->set( 'analytics-google.tracking.debug', true );
+
+	ga4Respond( Http::response( [ 'validationMessages' => [] ], 200 ) );
+
+	Log::shouldReceive( 'warning' )->never();
+
+	measurementProtocol()->pageView( [ 'path' => '/docs/one' ] );
+
+	expect( true )->toBeTrue();
+} );
+
 test( 'event names are normalized to GA4 rules', function ( string $input, string $expected ): void {
 	measurementProtocol()->event( $input, [] );
 
 	expect( sentPayload()['events'][0]['name'] )->toBe( $expected );
 } )->with( [
-	'spaces and dots'   => [ 'docs.code copy', 'docs_code_copy' ],
-	'leading digit'     => [ '2fa_enabled', '_2fa_enabled' ],
-	'punctuation'       => [ 'checkout:step-1', 'checkout_step_1' ],
-	'already valid'     => [ 'docs_code_copy', 'docs_code_copy' ],
-	'over forty chars'  => [ str_repeat( 'a', 60 ), str_repeat( 'a', 40 ) ],
+	'spaces and dots'      => [ 'docs.code copy', 'docs_code_copy' ],
+	// GA4 requires a name to start with a *letter*. Prefixing a leading digit
+	// with an underscore would swap one rejected name for another, because
+	// a leading underscore is reserved too.
+	'leading digit'        => [ '2fa_enabled', 'e_2fa_enabled' ],
+	'leading underscore'   => [ '_internal_event', 'e__internal_event' ],
+	// `ga_`, `google_` and `firebase_` are reserved prefixes.
+	'reserved ga prefix'   => [ 'ga_session_start', 'e_ga_session_start' ],
+	'reserved google'      => [ 'google_signup', 'e_google_signup' ],
+	'punctuation'          => [ 'checkout:step-1', 'checkout_step_1' ],
+	'already valid'        => [ 'docs_code_copy', 'docs_code_copy' ],
+	'over forty chars'     => [ str_repeat( 'a', 60 ), str_repeat( 'a', 40 ) ],
+	// The cap applies after prefixing, so the result cannot exceed 40 even
+	// when the prefix is added.
+	'prefixed and over'    => [ '9' . str_repeat( 'b', 60 ), 'e_9' . str_repeat( 'b', 37 ) ],
 ] );
+
+test( 'normalized event names always satisfy GA4 rules', function ( string $input, string $expected ): void {
+	// Belt to the dataset above: whatever the input, the result must be
+	// something GA4 will accept, since it discards non-conforming events
+	// silently.
+	expect( $expected )->toMatch( '/^[a-zA-Z][a-zA-Z0-9_]*$/' )
+		->and( strlen( $expected ) )->toBeLessThanOrEqual( 40 )
+		->and( $expected )->not->toStartWith( 'ga_' )
+		->and( $expected )->not->toStartWith( 'google_' )
+		->and( $expected )->not->toStartWith( 'firebase_' );
+} )->with( [
+	[ 'docs.code copy', 'docs_code_copy' ],
+	[ '2fa_enabled', 'e_2fa_enabled' ],
+	[ '_internal_event', 'e__internal_event' ],
+	[ 'ga_session_start', 'e_ga_session_start' ],
+	[ '9' . str_repeat( 'b', 60 ), 'e_9' . str_repeat( 'b', 37 ) ],
+] );
+
+test( 'custom parameter names are normalized to GA4 rules too', function (): void {
+	measurementProtocol()->event( 'docs_view', [
+		'properties' => [ '2nd-attempt' => 'yes', 'ga_internal' => 'no', 'fine_name' => 'ok' ],
+	] );
+
+	$params = sentPayload()['events'][0]['params'];
+
+	expect( $params )->toHaveKey( 'e_2nd_attempt' )
+		->toHaveKey( 'e_ga_internal' )
+		->toHaveKey( 'fine_name' );
+} );
 
 test( 'event properties are capped at the GA4 parameter limit', function (): void {
 	// GA4 rejects events carrying more than 25 parameters. Sending 40 and
@@ -221,15 +370,24 @@ test( 'a transport failure never propagates to the caller', function (): void {
 	// This runs on the ingest request path with a visitor waiting on a beacon
 	// response. GA4 being down must degrade to lost hits, never to a failed
 	// request in the host application.
-	Http::fake( [ 'www.google-analytics.com/*' => fn () => throw new RuntimeException( 'network down' ) ] );
+	ga4Respond( fn () => throw new RuntimeException( 'network down' ) );
+
+	Log::shouldReceive( 'warning' )
+		->once()
+		->withArgs( fn ( string $message ): bool => str_contains( $message, 'errored' ) );
 
 	measurementProtocol()->pageView( [ 'path' => '/docs/one' ] );
 
+	// Reaching here at all is the assertion: the throw was contained.
 	expect( true )->toBeTrue();
 } );
 
 test( 'a non-2xx response never propagates to the caller', function (): void {
-	Http::fake( [ 'www.google-analytics.com/*' => Http::response( 'bad request', 400 ) ] );
+	ga4Respond( Http::response( 'bad request', 400 ) );
+
+	Log::shouldReceive( 'warning' )
+		->once()
+		->withArgs( fn ( string $message, array $context ): bool => str_contains( $message, 'failed' ) && 400 === $context['status'] );
 
 	measurementProtocol()->event( 'docs_code_copy', [] );
 

@@ -3,7 +3,7 @@
   "description": "Google Analytics (GA4) provider for the ArtisanPack UI analytics package, with server-side Data API reporting via the google base package.",
   "type": "library",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "keywords": [
     "laravel",
     "google",
@@ -48,7 +48,8 @@
     "laravel/pint": "^1.26",
     "livewire/livewire": "^3.6",
     "orchestra/testbench": "^10.2|^11.0",
-    "friendsofphp/php-cs-fixer": "^3.75"
+    "friendsofphp/php-cs-fixer": "^3.75",
+    "artisanpack-ui/analytics": "^1.2"
   },
   "suggest": {
     "artisanpack-ui/google": "Required for server-side reporting via the GA4 Data API (^1.0). Client-side tracking works without it.",

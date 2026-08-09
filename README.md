@@ -54,6 +54,17 @@ GA4_MEASUREMENT_ID=G-XXXXXXX
 GA4_PROPERTY_ID=123456789
 ```
 
+To forward the analytics parent's page views and events to GA4 from the server (since 1.1.0), add a Measurement Protocol API secret:
+
+| Variable | Description |
+|---|---|
+| `GA4_API_SECRET` | Measurement Protocol API secret (GA4 → Admin → Data Streams → Measurement Protocol API secrets). Forwarding stays off until this and `GA4_MEASUREMENT_ID` are both set. |
+| `GA4_SERVER_SIDE_TRACKING` | Turns server-side forwarding off independently of the secret. Defaults to `true`. |
+| `GA4_PAGE_LOCATION_BASE` | Base URL used to build the absolute `page_location` GA4 expects. Defaults to `app.url`. |
+| `GA4_MEASUREMENT_PROTOCOL_DEBUG` | Sends hits to GA4's validation endpoint and logs the validation messages it returns. Defaults to `false`. |
+
+Read [`docs/analytics-parent-integration.md`](docs/analytics-parent-integration.md) before enabling this — it covers the caveats around double-counting against client-side `gtag.js`, attribution, and session boundaries.
+
 ## Client-side tracking
 
 ### Blade
@@ -193,6 +204,8 @@ See [`config/analytics-google.php`](config/analytics-google.php). Highlights:
 
 - `tracking.measurement_id` — GA4 measurement ID (`G-XXXXXXX`). Leave empty to disable the client-side snippet.
 - `tracking.respect_consent` — whether to defer `page_view` until the analytics parent's consent gate grants the `analytics` category. Defaults to `true`.
+- `tracking.api_secret` / `tracking.server_side` — Measurement Protocol API secret and the switch for server-side forwarding of the analytics parent's page views and events.
+- `tracking.page_location_base` / `tracking.timeout` / `tracking.debug` — absolute-URL base, HTTP timeout, and validation-endpoint toggle for Measurement Protocol calls.
 - `reporting.property_id` — GA4 numeric property ID for Data API queries.
 - `reporting.cache_ttl` — how long (seconds) to cache Data API responses. Set to `0` to disable.
 - `provider_name` — the name this package registers under with the `artisanpack-ui/analytics` parent. Defaults to `google-ga4`.

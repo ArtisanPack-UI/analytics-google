@@ -23,6 +23,23 @@ Copies `config/analytics-google.php` into your app. The published file is the so
 
 The `@ga4Snippet` directive and React/Vue components respect this switch. When off, they emit nothing at all.
 
+### I want to forward the analytics parent's page views and events to GA4 from the server
+
+Added in 1.1.0. Set `GA4_API_SECRET` alongside `GA4_MEASUREMENT_ID` — forwarding stays off until both are present.
+
+```php
+'tracking' => [
+    'api_secret'  => env( 'GA4_API_SECRET' ),
+    'server_side' => env( 'GA4_SERVER_SIDE_TRACKING', true ),
+],
+```
+
+Turn it off without unsetting the secret via `GA4_SERVER_SIDE_TRACKING=false`. Anything both this and the client-side snippet observe is counted twice — see [Analytics Parent Integration](Analytics-Parent-Integration) for that and the attribution and session-boundary caveats.
+
+### I want to debug a Measurement Protocol payload GA4 seems to be dropping
+
+Set `GA4_MEASUREMENT_PROTOCOL_DEBUG=true`. Hits go to GA4's validation endpoint instead of the live one, and the `validationMessages` it returns are logged. The live endpoint answers `2xx` and discards non-conforming events silently, so this is the only way to see what it objects to. If GA4's hostname or page-path reporting is empty, set `GA4_PAGE_LOCATION_BASE` — it defaults to `app.url` and builds the absolute `page_location` GA4 expects.
+
 ### I want to change the GA4 property server-side reporting targets
 
 Set `GA4_PROPERTY_ID`. Or set `analytics-google.reporting.property_id` directly. Overridable per call via `Ga4DataClient::runReport( $request, $connection, $propertyId )`.

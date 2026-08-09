@@ -14,6 +14,17 @@ Every env var the package reads, in one place.
 | `GA4_TRACKING_ENABLED` | bool | `true` | `analytics-google.tracking.enabled`. Master switch for the tracker. Set to `false` to disable in staging / CI without unsetting the measurement ID. |
 | `GA4_PROPERTY_ID` | string | `null` | `analytics-google.reporting.property_id`. The numeric GA4 property ID Data API queries target. Missing → `Ga4DataClient::runReport()` throws [`ReportingException::missingConfiguration()`](API-Reference-Exceptions). |
 
+## Server-side forwarding
+
+Added in 1.1.0. These drive the Measurement Protocol client that forwards the analytics parent's page views and events to GA4 from the server. See [Analytics Parent Integration](Analytics-Parent-Integration) for the double-counting, attribution, and session-boundary caveats.
+
+| Variable | Type | Default | Read by |
+|---|---|---|---|
+| `GA4_API_SECRET` | string | `null` | `analytics-google.tracking.api_secret`. Measurement Protocol API secret (GA4 → Admin → Data Streams → Measurement Protocol API secrets). Forwarding stays off until this and `GA4_MEASUREMENT_ID` are both set. |
+| `GA4_SERVER_SIDE_TRACKING` | bool | `true` | `analytics-google.tracking.server_side`. Switch for forwarding, independent of the secret. Set to `false` to keep the secret configured while sending nothing. |
+| `GA4_PAGE_LOCATION_BASE` | string | `app.url` | `analytics-google.tracking.page_location_base`. Base URL for building the absolute `page_location` GA4 expects. A bare path leaves GA4's hostname and page-path reporting empty while the hit still succeeds. |
+| `GA4_MEASUREMENT_PROTOCOL_DEBUG` | bool | `false` | `analytics-google.tracking.debug`. Targets GA4's validation endpoint and logs the `validationMessages` it returns. The live endpoint accepts malformed payloads silently. |
+
 ## Framework env vars this package leans on
 
 | Variable | Why it matters |
@@ -28,6 +39,7 @@ These keys have no env fallback and must be set in `config/analytics-google.php`
 
 - `analytics-google.tracking.config` — extra `gtag('config', ...)` options.
 - `analytics-google.tracking.respect_consent` — whether the emitted snippet defers to the analytics parent's consent gate.
+- `analytics-google.tracking.timeout` — request timeout in seconds for Measurement Protocol calls. Deliberately short; forwarding runs on the ingest request path.
 - `analytics-google.reporting.api_base` — GA4 Data API base URL.
 - `analytics-google.reporting.timeout` — request timeout in seconds.
 - `analytics-google.reporting.cache_ttl` — cache TTL in seconds.

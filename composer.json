@@ -3,7 +3,7 @@
   "description": "Google Analytics (GA4) provider for the ArtisanPack UI analytics package, with server-side Data API reporting via the google base package.",
   "type": "library",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "keywords": [
     "laravel",
     "google",

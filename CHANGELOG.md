@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-09
+
 ### Added
 
 - **Server-side GA4 forwarding over the Measurement Protocol.** `Ga4AnalyticsProviderAdapter::trackPageView()` and `::trackEvent()` were intentional no-ops, so adding `google-ga4` to the analytics parent's `active_providers` registered a provider that reported `isEnabled()` true and sent nothing, with no error and no warning — indistinguishable from a configuration problem in the consuming application. They now relay to GA4. Requires a `GA4_API_SECRET` alongside the measurement ID (GA4 → Admin → Data Streams → Measurement Protocol API secrets); forwarding stays off until both are present and can be disabled independently with `GA4_SERVER_SIDE_TRACKING=false`. ([#15](https://github.com/ArtisanPack-UI/analytics-google/issues/15))
@@ -47,5 +49,6 @@ Initial release of the Google Analytics 4 (GA4) integration for the ArtisanPack 
 - **Comprehensive documentation** — full `docs/` tree covering installation, client-side tracking, server-side reporting, components, HTTP endpoints, analytics-parent integration, and a complete API reference.
 - **Laravel 10, 11, 12, and 13 support** — CI matrix runs PHP 8.2 / 8.3 / 8.4 against Laravel 12 and 13.
 
-[Unreleased]: https://github.com/ArtisanPack-UI/analytics-google/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ArtisanPack-UI/analytics-google/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ArtisanPack-UI/analytics-google/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ArtisanPack-UI/analytics-google/releases/tag/v1.0.0

@@ -55,6 +55,9 @@ class Ga4AnalyticsProviderAdapter implements AnalyticsProviderInterface
     /**
      * Forward a page view to GA4.
      *
+     * A no-op until 1.1.0; forwards over the Measurement Protocol since 1.1.0,
+     * and still does nothing when no client was supplied.
+     *
      * @since 1.0.0
      */
     public function trackPageView( PageViewData $data ): void
@@ -73,6 +76,9 @@ class Ga4AnalyticsProviderAdapter implements AnalyticsProviderInterface
 
     /**
      * Forward a custom event to GA4.
+     *
+     * A no-op until 1.1.0; forwards over the Measurement Protocol since 1.1.0,
+     * and still does nothing when no client was supplied.
      *
      * @since 1.0.0
      */

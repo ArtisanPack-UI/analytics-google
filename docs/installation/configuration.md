@@ -15,6 +15,7 @@ The published file is the source of truth — this page mirrors it and explains 
 ## Sections
 
 - [Client-side tracking](#client-side-tracking)
+- [Server-side forwarding](#server-side-forwarding)
 - [Server-side reporting](#server-side-reporting)
 - [Provider registration](#provider-registration)
 - [OAuth scopes](#oauth-scopes)
@@ -39,6 +40,28 @@ The published file is the source of truth — this page mirrors it and explains 
 - **`respect_consent`** — When `true` (default), the emitted snippet sets `gtag('consent', 'default', { analytics_storage: 'denied' })` unless `window.__apAnalyticsConsent.analytics === true`. Set to `false` to fire tracking unconditionally on every page load.
 
 Full details on the emitted markup and the consent flag: [Client-Side Tracking](Client-Side-Tracking) and [Consent Integration](Client-Side-Tracking-Consent-Integration).
+
+## Server-side forwarding
+
+Added in 1.1.0. These keys live under the same `tracking` section and control the Measurement Protocol client that forwards the analytics parent's page views and events to GA4 from the server.
+
+```php
+'tracking' => [
+    'api_secret'         => env( 'GA4_API_SECRET' ),
+    'server_side'        => env( 'GA4_SERVER_SIDE_TRACKING', true ),
+    'page_location_base' => env( 'GA4_PAGE_LOCATION_BASE' ),
+    'timeout'            => 3,
+    'debug'              => env( 'GA4_MEASUREMENT_PROTOCOL_DEBUG', false ),
+],
+```
+
+- **`api_secret`** — Measurement Protocol API secret, created in GA4 under Admin → Data Streams → Measurement Protocol API secrets. Forwarding stays off until this and `measurement_id` are both set.
+- **`server_side`** — Switch for forwarding, independent of the secret. Set to `false` to keep the secret configured while sending nothing.
+- **`page_location_base`** — Base URL used to build the absolute `page_location` GA4 expects. Defaults to `app.url`. A bare path leaves GA4's hostname and page-path reporting empty while the hit still succeeds.
+- **`timeout`** — Request timeout in seconds. Deliberately short: forwarding runs on the ingest request path with a visitor waiting on a beacon response, so a GA4 outage degrades to lost hits rather than a slow host application.
+- **`debug`** — Targets GA4's validation endpoint and logs the `validationMessages` it returns. The live endpoint accepts malformed payloads silently, so this is the only way to see what GA4 would reject.
+
+Client-side `gtag.js` and server-side forwarding both observing the same event counts it twice. Read [Analytics Parent Integration](Analytics-Parent-Integration) for the double-counting, attribution, and session-boundary caveats before enabling this.
 
 ## Server-side reporting
 

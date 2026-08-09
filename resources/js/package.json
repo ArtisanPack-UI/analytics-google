@@ -1,7 +1,7 @@
 {
     "name": "@artisanpack-ui/analytics-google-js",
     "private": true,
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "React and Vue components for the ArtisanPack UI Analytics Google (GA4) package.",
     "main": "index.ts",
     "type": "module",

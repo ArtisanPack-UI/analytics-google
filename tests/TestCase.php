@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace Tests;
 
+use ArtisanPackUI\Analytics\AnalyticsServiceProvider;
 use ArtisanPackUI\AnalyticsGoogle\AnalyticsGoogleServiceProvider;
 use ArtisanPackUI\AnalyticsGoogle\Support\BaseInstalled;
 use ArtisanPackUI\Google\GoogleServiceProvider;
@@ -38,6 +39,11 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders( $app ): array
     {
         return [
+            // The parent is a dev dependency, so this registers it only for
+            // the test suite. It is what lets a test resolve the provider the
+            // service provider registers, rather than only ever constructing
+            // the adapter by hand.
+            AnalyticsServiceProvider::class,
             GoogleServiceProvider::class,
             AnalyticsGoogleServiceProvider::class,
         ];

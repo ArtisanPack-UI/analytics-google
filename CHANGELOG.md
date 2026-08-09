@@ -25,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validation messages are surfaced. GA4's debug endpoint answers `200` with a `validationMessages` array describing what it would reject; reading only the status code there made debug mode report nothing, which is the opposite of its purpose.
 - Measurement Protocol calls fail soft: transport errors and non-2xx responses are logged and swallowed, with a short timeout. Forwarding runs on the ingest request path with a visitor waiting on a beacon response, so a GA4 outage must degrade to lost hits rather than to a slow or failing host application.
 
+### Fixed
+
+- The 25-parameter cap now holds once `session_id` is added. The cap was applied to the event properties and the session ID appended afterwards, so an event carrying 25 properties plus a valid numeric session ID left with 26 parameters — and GA4 discards over-limit events silently, the exact failure this release exists to remove. The session ID now claims a reserved slot.
+- A custom property named `session_id` can no longer reach GA4 unvalidated. It went straight through the property loop, bypassing the `^\d+$` check that keeps a malformed session ID from getting the whole hit rejected.
+- The GA4 API secret is redacted from logged transport errors. It travels in the query string per Google's spec, and Guzzle embeds the full request URI in its exception messages, so a timeout could write a credential that can post events to the property into the application log.
+- `GA4_PAGE_LOCATION_BASE=` with no value falls back to `app.url` again. An empty string is not `null`, so the null-coalescing fallback did not fire and `page_location` was sent as a bare path — which leaves GA4's hostname and page-path reporting empty, the very thing the setting exists to prevent.
+
 ### Notes
 
 - Client-side `gtag.js` and server-side forwarding are complementary, not alternatives — but anything both observe is counted twice. Run one or the other per event stream.

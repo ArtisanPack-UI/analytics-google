@@ -2,6 +2,7 @@
 
 declare( strict_types=1 );
 
+use ArtisanPackUI\Analytics\Analytics;
 use ArtisanPackUI\Analytics\Data\EventData;
 use ArtisanPackUI\Analytics\Data\PageViewData;
 use ArtisanPackUI\AnalyticsGoogle\Providers\Ga4AnalyticsProviderAdapter;
@@ -26,11 +27,14 @@ beforeEach( function (): void {
 	// fake() for the same URL in a test is silently ignored — which made the
 	// transport-failure tests here pass without ever exercising a failure.
 	// Tests change the response through ga4Respond() instead.
-	test()->ga4Response = Http::response( '', 204 );
+	//
+	// Held in a static rather than on the test case: a dynamic property on
+	// TestCase is deprecated as of PHP 8.2.
+	ga4Respond( Http::response( '', 204 ) );
 
 	Http::fake( [
 		'www.google-analytics.com/*' => function ( Request $request ) {
-			$response = test()->ga4Response;
+			$response = ga4Response();
 
 			return is_callable( $response ) ? $response( $request ) : $response;
 		},
@@ -44,7 +48,31 @@ beforeEach( function (): void {
  */
 function ga4Respond( mixed $response ): void
 {
-	test()->ga4Response = $response;
+	ga4ResponseStore( $response );
+}
+
+/**
+ * The response the faked GA4 endpoint is currently set to return.
+ */
+function ga4Response(): mixed
+{
+	return ga4ResponseStore();
+}
+
+/**
+ * Backing store for the faked GA4 response.
+ *
+ * @param mixed $response The response to store, or nothing to read the current one.
+ */
+function ga4ResponseStore( mixed $response = null ): mixed
+{
+	static $stored = null;
+
+	if ( 1 === func_num_args() ) {
+		$stored = $response;
+	}
+
+	return $stored;
 }
 
 /**
@@ -134,6 +162,18 @@ test( 'the page location base can be overridden', function (): void {
 
 	expect( sentPayload()['events'][0]['params']['page_location'] )
 		->toBe( 'https://cdn.example.test/docs/one' );
+} );
+
+test( 'an empty page location base still falls back to app.url', function (): void {
+	// `GA4_PAGE_LOCATION_BASE=` with no value reads as an empty string, not
+	// null, so a null-coalescing fallback would leave the path bare — and a
+	// bare page_location empties GA4's hostname and page-path reporting.
+	config()->set( 'analytics-google.tracking.page_location_base', '' );
+
+	measurementProtocol()->pageView( [ 'path' => '/docs/one' ] );
+
+	expect( sentPayload()['events'][0]['params']['page_location'] )
+		->toBe( 'https://docs.example.test/docs/one' );
 } );
 
 test( 'UTM parameters are mapped onto GA4 traffic source params', function (): void {
@@ -267,22 +307,36 @@ test( 'event names are normalized to GA4 rules', function ( string $input, strin
 	'prefixed and over'    => [ '9' . str_repeat( 'b', 60 ), 'e_9' . str_repeat( 'b', 37 ) ],
 ] );
 
-test( 'normalized event names always satisfy GA4 rules', function ( string $input, string $expected ): void {
-	// Belt to the dataset above: whatever the input, the result must be
-	// something GA4 will accept, since it discards non-conforming events
-	// silently.
-	expect( $expected )->toMatch( '/^[a-zA-Z][a-zA-Z0-9_]*$/' )
-		->and( strlen( $expected ) )->toBeLessThanOrEqual( 40 )
-		->and( $expected )->not->toStartWith( 'ga_' )
-		->and( $expected )->not->toStartWith( 'google_' )
-		->and( $expected )->not->toStartWith( 'firebase_' );
+test( 'normalized event names always satisfy GA4 rules', function ( string $input ): void {
+	// Belt to the dataset above: whatever the input, the name that actually
+	// leaves must be something GA4 will accept, since it discards
+	// non-conforming events silently.
+	measurementProtocol()->event( $input, [] );
+
+	$name = sentPayload()['events'][0]['name'];
+
+	expect( $name )->toMatch( '/^[a-zA-Z][a-zA-Z0-9_]*$/' )
+		->and( strlen( $name ) )->toBeLessThanOrEqual( 40 )
+		->and( $name )->not->toStartWith( 'ga_' )
+		->and( $name )->not->toStartWith( 'google_' )
+		->and( $name )->not->toStartWith( 'firebase_' );
 } )->with( [
-	[ 'docs.code copy', 'docs_code_copy' ],
-	[ '2fa_enabled', 'e_2fa_enabled' ],
-	[ '_internal_event', 'e__internal_event' ],
-	[ 'ga_session_start', 'e_ga_session_start' ],
-	[ '9' . str_repeat( 'b', 60 ), 'e_9' . str_repeat( 'b', 37 ) ],
+	'spaces and dots'      => 'docs.code copy',
+	'leading digit'        => '2fa_enabled',
+	'leading underscore'   => '_internal_event',
+	'reserved ga prefix'   => 'ga_session_start',
+	'reserved google'      => 'google_signup',
+	'reserved firebase'    => 'firebase_init',
+	'punctuation only'     => '---',
+	'prefixed and over'    => '9xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 ] );
+
+test( 'an event with an empty name is dropped rather than sent', function (): void {
+	// There is no name GA4 would accept here, so the hit is not worth making.
+	measurementProtocol()->event( '', [] );
+
+	Http::assertNothingSent();
+} );
 
 test( 'custom parameter names are normalized to GA4 rules too', function (): void {
 	measurementProtocol()->event( 'docs_view', [
@@ -308,6 +362,39 @@ test( 'event properties are capped at the GA4 parameter limit', function (): voi
 	measurementProtocol()->event( 'big_event', [ 'properties' => $properties ] );
 
 	expect( count( sentPayload()['events'][0]['params'] ) )->toBeLessThanOrEqual( 25 );
+} );
+
+test( 'the parameter cap still holds once a valid session ID is added', function (): void {
+	// The cap is applied to the properties, but `session_id` is appended
+	// afterwards. Without a reserved slot that combination ships 26
+	// parameters, and GA4 discards the event without saying so.
+	$properties = [];
+
+	for ( $i = 0; $i < 40; $i++ ) {
+		$properties[ 'prop_' . $i ] = $i;
+	}
+
+	measurementProtocol()->event( 'big_event', [
+		'properties' => $properties,
+		'session_id' => '1712345678',
+	] );
+
+	$params = sentPayload()['events'][0]['params'];
+
+	expect( count( $params ) )->toBeLessThanOrEqual( 25 )
+		->and( $params )->toHaveKey( 'session_id' )
+		->and( $params['session_id'] )->toBe( '1712345678' );
+} );
+
+test( 'a custom session_id property cannot bypass session ID validation', function (): void {
+	// Straight through the property loop, this would reach GA4 unvalidated —
+	// and GA4 rejects or mis-attributes a malformed session ID rather than
+	// erroring.
+	measurementProtocol()->event( 'sneaky_event', [
+		'properties' => [ 'session_id' => 'not-a-number' ],
+	] );
+
+	expect( sentPayload()['events'][0]['params'] )->not->toHaveKey( 'session_id' );
 } );
 
 test( 'non-scalar event properties are dropped rather than sent', function (): void {
@@ -392,6 +479,37 @@ test( 'a non-2xx response never propagates to the caller', function (): void {
 	measurementProtocol()->event( 'docs_code_copy', [] );
 
 	expect( true )->toBeTrue();
+} );
+
+test( 'the API secret is redacted out of logged transport errors', function (): void {
+	// The secret rides in the query string per Google's spec, and Guzzle puts
+	// the full request URI in its transport exception messages. Logging one
+	// verbatim writes a credential that can post events to the property into
+	// the application log.
+	ga4Respond( fn () => throw new RuntimeException( 'cURL error 28 for https://www.google-analytics.com/mp/collect?measurement_id=G-TESTID123&api_secret=test-secret' ) );
+
+	Log::shouldReceive( 'warning' )
+		->once()
+		->withArgs( fn ( string $message, array $context ): bool => ! str_contains( $context['error'], 'test-secret' )
+			&& str_contains( $context['error'], '***' ) );
+
+	measurementProtocol()->pageView( [ 'path' => '/docs/one' ] );
+
+	expect( true )->toBeTrue();
+} );
+
+test( 'the adapter registered with the analytics parent forwards to GA4', function (): void {
+	// Every other adapter test constructs the adapter by hand, so dropping the
+	// MeasurementProtocol argument from the service provider's registration
+	// would leave them all green while forwarding silently stopped — exactly
+	// the regression this release exists to fix.
+	$adapter = app( Analytics::class )->provider( 'google-ga4' );
+
+	$adapter->trackPageView( new PageViewData( path: '/docs/one' ) );
+
+	expect( sentPayload()['events'][0]['name'] )->toBe( 'page_view' )
+		->and( sentPayload()['events'][0]['params']['page_location'] )
+		->toBe( 'https://docs.example.test/docs/one' );
 } );
 
 test( 'the provider adapter forwards page views through the Measurement Protocol', function (): void {

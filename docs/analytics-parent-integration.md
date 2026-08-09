@@ -89,7 +89,7 @@ server-side forwarding are complementary rather than alternatives, but anything
 they both observe is counted twice. Per event stream, either render the snippet
 *or* forward.
 
-Two things worth knowing before relying on forwarding:
+Worth knowing before relying on forwarding:
 
 - Measurement Protocol hits carry less attribution than a `gtag.js` tag.
   Referrer, geography, device and session stitching are weaker or absent unless

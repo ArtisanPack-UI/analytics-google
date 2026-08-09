@@ -210,9 +210,27 @@ class MeasurementProtocol
 			],
 		];
 
+		// `session_id` is protocol-managed. A custom property normalizing to
+		// that name would otherwise reach GA4 without going through the
+		// validation below, which is the one thing that keeps an invalid
+		// session ID from getting the whole hit rejected.
+		unset( $payload['events'][0]['params']['session_id'] );
+
 		$sessionId = $this->sessionId( $data['session_id'] ?? null );
 
 		if ( null !== $sessionId ) {
+			// `event()` caps the parameters before this point, so appending
+			// here could push the event to 26 and over GA4's limit — which it
+			// enforces by discarding the event silently. Reserve the slot by
+			// dropping the last custom parameter: the session ID carries more
+			// than a 25th property does.
+			$payload['events'][0]['params'] = array_slice(
+				$payload['events'][0]['params'],
+				0,
+				self::MAX_EVENT_PARAMS - 1,
+				true,
+			);
+
 			$payload['events'][0]['params']['session_id'] = $sessionId;
 		}
 
@@ -256,10 +274,38 @@ class MeasurementProtocol
 		} catch ( Throwable $e ) {
 			// Never let GA4 take the host application's request with it.
 			Log::warning( 'GA4 Measurement Protocol request errored', [
-				'error' => $e->getMessage(),
+				'error' => $this->redactSecret( $e->getMessage() ),
 				'event' => $name,
 			] );
 		}
+	}
+
+	/**
+	 * Strip the API secret out of a message bound for the log.
+	 *
+	 * The secret travels in the query string, as Google's spec requires, and
+	 * Guzzle embeds the full request URI in its transport exception messages.
+	 * Logging one verbatim would write a credential that can post events to
+	 * the property into the application log, and on to wherever logs are
+	 * shipped.
+	 *
+	 * @param string $message The message to redact.
+	 *
+	 * @return string The message with any form of the secret replaced.
+	 *
+	 * @since 1.1.0
+	 */
+	protected function redactSecret( string $message ): string
+	{
+		$secret = $this->apiSecret();
+
+		if ( '' === $secret ) {
+			return $message;
+		}
+
+		// Both forms: the URL carries the encoded one, an exception wrapping
+		// config could carry the raw one.
+		return str_replace( [ rawurlencode( $secret ), $secret ], '***', $message );
 	}
 
 	/**
@@ -314,8 +360,9 @@ class MeasurementProtocol
 
 		$sessionId = trim( (string) $sessionId );
 
-		// Digits only, and non-zero. `ctype_digit` alone would accept "0".
-		if ( 1 !== preg_match( '/^\d+$/', $sessionId ) || '0' === ltrim( $sessionId, '0' ) || '' === ltrim( $sessionId, '0' ) ) {
+		// Digits only, and non-zero. `ctype_digit` alone would accept "0", and
+		// trimming leading zeros to nothing catches "0", "00" and friends.
+		if ( 1 !== preg_match( '/^\d+$/', $sessionId ) || '' === ltrim( $sessionId, '0' ) ) {
 			return null;
 		}
 
@@ -336,10 +383,14 @@ class MeasurementProtocol
 			return $path;
 		}
 
-		$base = (string) (
-			$this->config->get( 'analytics-google.tracking.page_location_base' )
-			?? $this->config->get( 'app.url', '' )
-		);
+		// `??` would fall back only on null, so `GA4_PAGE_LOCATION_BASE=` with
+		// no value would defeat the `app.url` fallback and send the bare path
+		// this method exists to avoid.
+		$base = trim( (string) ( $this->config->get( 'analytics-google.tracking.page_location_base' ) ?? '' ) );
+
+		if ( '' === $base ) {
+			$base = trim( (string) ( $this->config->get( 'app.url', '' ) ?? '' ) );
+		}
 
 		if ( '' === $base ) {
 			return $path;
